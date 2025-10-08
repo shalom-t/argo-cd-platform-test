@@ -14,7 +14,7 @@ spec:
   # GitOps source configuration - where to find the Kubernetes manifests
   source:
     # Git repository URL containing the manifests
-    repoURL: git@github.com:shalom-t/argo-cd-platform-test.git
+    repoURL: https://github.com/shalom-t/argo-cd-platform-test.git
     # Git branch/tag to track
     targetRevision: main
     # Path within the repository where the manifests are located
