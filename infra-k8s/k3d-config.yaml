@@ -1,0 +1,36 @@
+# k3d cluster configuration - defines a local Kubernetes cluster for development
+# k3d is a lightweight wrapper to run k3s (Rancher's minimal Kubernetes) in Docker
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+metadata:
+  # Name of the k3d cluster (will create Docker containers with this prefix)
+  name: fido-exam
+# Number of server nodes (control plane) - 1 is typical for dev clusters
+servers: 1
+# Number of agent nodes (worker nodes) - these run your application workloads
+agents: 3
+# Container registry configuration for local image storage
+registries:
+  # Create a local Docker registry as part of the cluster
+  create: 
+    # Name of the registry container
+    name: my-registry
+  # Registry mirror configuration for pulling images
+  config: |
+    mirrors:
+      "my-registry.local":
+        endpoint:
+          # Local registry endpoint URL (accessible from within the cluster)
+          - http://my-registry.local:5000
+# Port mappings from host machine to cluster
+ports:
+  # Map host port 8080 to cluster port 80 (HTTP traffic)
+  - port: 8080:80
+    nodeFilters:
+      # Apply to the k3d load balancer (ingress entry point)
+      - loadbalancer
+  # Map host port 443 to cluster port 443 (HTTPS traffic)
+  - port: 443:443
+    nodeFilters:
+      # Apply to the k3d load balancer
+      - loadbalancer

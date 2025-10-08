@@ -1,0 +1,20 @@
+# Kubernetes Service resource - provides stable networking for pods
+apiVersion: v1
+kind: Service
+metadata:
+  # Name of the service - used by IngressRoute and other resources to reference it
+  name: nginx-service
+spec:
+  # Selector determines which pods receive traffic from this service
+  # This matches pods with the label "app: nginx" (see deployment.yaml)
+  selector:
+    app: nginx
+  # Port configuration for the service
+  ports:
+    # Port 80 is where the service listens for incoming requests
+    - port: 80
+      # targetPort is where traffic is forwarded to on the pods (nginx container port)
+      targetPort: 80
+  # ClusterIP type means this service is only accessible within the cluster
+  # External access is provided via the IngressRoute (ingress.yaml)
+  type: ClusterIP

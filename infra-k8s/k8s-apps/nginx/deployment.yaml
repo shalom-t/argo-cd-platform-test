@@ -1,0 +1,35 @@
+# Kubernetes Deployment - manages a set of identical pods and ensures they're running
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Name of the deployment resource
+  name: nginx
+  # Labels applied to the deployment itself (for organization/filtering)
+  labels:
+    app: nginx
+spec:
+  # Number of pod replicas to maintain - Kubernetes will ensure 1 pod is always running
+  replicas: 1
+  # Selector determines which pods this deployment manages
+  # Must match the labels in the pod template below
+  selector:
+    matchLabels:
+      app: nginx
+  # Template defines the pod specification that will be created
+  template:
+    metadata:
+      # Labels applied to each pod - these must match the selector above
+      # The service.yaml uses this label to find pods to route traffic to
+      labels:
+        app: nginx
+    spec:
+      # List of containers to run in each pod
+      containers:
+        # Container name within the pod
+        - name: nginx
+          # Docker image to use - nginx version 1.17.3
+          image: nginx:1.17.3
+          # Ports that the container exposes
+          ports:
+            # Nginx listens on port 80 - this is where the service forwards traffic
+            - containerPort: 80

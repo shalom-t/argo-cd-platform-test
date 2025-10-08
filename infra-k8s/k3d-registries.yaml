@@ -1,0 +1,10 @@
+# k3d registry mirrors configuration
+# This file configures how k3s nodes resolve and pull container images
+# Can be used with: k3d cluster create --registry-config k3d-registries.yaml
+mirrors:
+  # Mirror configuration for the local registry
+  my-registry:
+    endpoint:
+      # Docker registry v2 API endpoint for the local registry
+      # Images tagged as "my-registry/*" will pull from this endpoint
+      - http://my-registry/v2

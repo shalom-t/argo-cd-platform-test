@@ -1,0 +1,25 @@
+# Traefik IngressRoute - routes external traffic into the cluster
+# This is Traefik's custom resource (not standard Kubernetes Ingress)
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  # Name of this ingress route resource
+  name: nginx-ingressroute
+spec:
+  # Entry points define which Traefik listeners to use
+  # "web" typically means HTTP traffic on port 80
+  entryPoints:
+    - web
+  # Routing rules - define how to match and route incoming requests
+  routes:
+    # Match requests with hostname "nginx.local"
+    # You need to add "127.0.0.1 nginx.local" to your /etc/hosts file
+    - match: Host(`nginx.local`)
+      # Type of matching rule
+      kind: Rule
+      # Backend services to route the matched traffic to
+      services:
+        # Routes to the nginx-service defined in service.yaml
+        - name: nginx-service
+          # Port on the service to send traffic to
+          port: 80

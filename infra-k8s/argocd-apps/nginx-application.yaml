@@ -1,0 +1,45 @@
+# ArgoCD Application - GitOps deployment configuration for Nginx
+# This defines how ArgoCD should deploy and manage the Nginx application
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  # Name of the ArgoCD application (visible in ArgoCD UI)
+  name: nginx
+  # ArgoCD applications are typically deployed in the argocd namespace
+  namespace: argocd
+  # Finalizers ensure proper cleanup when the application is deleted
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  # GitOps source configuration - where to find the Kubernetes manifests
+  source:
+    # Git repository URL containing the manifests
+    repoURL: git@github.com:shalom-t/argo-cd-platform-test.git
+    # Git branch/tag to track
+    targetRevision: main
+    # Path within the repository where the manifests are located
+    path: infra-k8s/k8s-apps/nginx
+  # Target cluster and namespace configuration
+  destination:
+    # Cluster URL - in-cluster means the same cluster where ArgoCD is running
+    server: https://kubernetes.default.svc
+    # Target namespace where the application will be deployed
+    namespace: default
+  # Project configuration - 'default' is the built-in ArgoCD project
+  project: default
+  # Sync policy configuration
+  syncPolicy:
+    # Automated sync configuration
+    automated:
+      # Automatically apply changes when Git repository is updated
+      selfHeal: true
+      # Automatically remove resources when they're removed from Git
+      prune: true
+    # Sync options for fine-tuning behavior
+    syncOptions:
+      # Create namespace if it doesn't exist
+      - CreateNamespace=true
+      # Validate resources before applying them
+      - Validate=true
+      # Delete resources last during pruning (safer for dependencies)
+      - PruneLast=true
