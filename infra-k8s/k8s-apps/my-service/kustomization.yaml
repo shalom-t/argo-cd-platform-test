@@ -1,0 +1,14 @@
+# Kustomization file - defines how to build and customize Kubernetes resources
+# Kustomize is built into kubectl and used by ArgoCD for GitOps deployments
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Default namespace for all resources defined in this kustomization
+# All resources (deployment, service, ingress) will be created in the "my-service" namespace
+namespace: my-service
+
+# List of Kubernetes resource files to include in this kustomization
+# These files will be combined and deployed together as a single application
+resources:
+  # Creates the my-service deployment with 1 replica
+  - deployment.yaml

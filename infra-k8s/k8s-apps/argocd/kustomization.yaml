@@ -9,7 +9,7 @@ namespace: argocd
 # Standard Kubernetes resources to include
 resources:
   # Creates the argocd namespace before installing the chart
-  - namespace.yaml
+  - argocd-namespace.yaml
 
 # Helm chart installations managed by Kustomize
 # Note: Requires kubectl with Helm chart inflation support

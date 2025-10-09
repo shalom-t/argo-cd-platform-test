@@ -10,6 +10,8 @@ namespace: argocd
 resources:
   # Nginx application deployment via GitOps
   - nginx-application.yaml
+  # My Service application deployment via GitOps
+  - my-service-application.yaml
 
 # Common labels for all ArgoCD applications
 labels:

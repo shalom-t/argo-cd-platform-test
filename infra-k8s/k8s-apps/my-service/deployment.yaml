@@ -1,0 +1,43 @@
+# Kubernetes Deployment - manages a set of identical pods and ensures they're running
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # Name of the deployment resource
+  name: my-service
+  labels:
+    app: my-service
+spec:
+  # Number of pod replicas to maintain - Kubernetes will ensure 1 pod is always running
+  replicas: 1
+  # Selector determines which pods this deployment manages
+  selector:
+    matchLabels:
+      app: my-service
+  template:
+    metadata:
+      # Labels applied to each pod - these must match the selector above
+      # The service.yaml uses this label to find pods to route traffic to
+      labels:
+        app: my-service
+    spec:
+      containers:
+        # Container name within the pod
+        - name: my-service
+          # Docker image to use - my-service version latest
+          image: my-service:latest
+          # Ports that the container exposes
+          ports:
+            - containerPort: 9000
+          # Always pull the latest image
+          imagePullPolicy: Always
+          # Environment variables for the container
+          # env:
+          #   # Port for the container
+          #   - name: PORT
+          #     value: "80"
+          #   # Host address for the container
+          #   - name: HOST
+          #     value: "0.0.0.0"
+          #   # Debug flag for the container
+          #   - name: DEBUG
+          #     value: "true"

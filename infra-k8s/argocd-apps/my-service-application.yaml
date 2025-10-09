@@ -1,0 +1,37 @@
+# ArgoCD Application - GitOps deployment configuration for My Service
+# This defines how ArgoCD should deploy and manage the My Service application
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  # Name of the ArgoCD application (visible in ArgoCD UI)
+  name: my-service
+  namespace: argocd
+spec:
+  # GitOps source configuration - where to find the Kubernetes manifests
+  source:
+    # Git repository URL containing the manifests
+    repoURL: https://github.com/shalom-t/argo-cd-platform-test.git
+    targetRevision: main
+    path: infra-k8s/k8s-apps/my-service
+  # Target cluster and namespace configuration
+  destination:
+    # Cluster URL - in-cluster means the same cluster where ArgoCD is running
+    server: https://kubernetes.default.svc
+    namespace: default
+  # Project configuration - 'default' is the built-in ArgoCD project
+  project: default
+  # Sync policy configuration
+  syncPolicy:
+    automated:
+      # Automatically remove resources when they're removed from Git
+      prune: true
+      # Automatically apply changes when Git repository is updated
+      selfHeal: true
+    # Sync options for fine-tuning behavior
+    syncOptions:
+      # Create namespace if it doesn't exist
+      - CreateNamespace=true
+      # Validate resources before applying them
+      - Validate=true
+      # Delete resources last during pruning (safer for dependencies)
+      - PruneLast=true

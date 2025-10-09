@@ -1,0 +1,15 @@
+# Python cache directories
+**/__pycache__/
+__pycache__/
+
+# Virtual environments
+**/.venv/
+.venv/
+
+# Charts directories
+**/charts/
+charts/
+
+# Clients directories  
+**/clients/
+clients/

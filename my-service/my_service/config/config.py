@@ -10,9 +10,9 @@ class Settings(BaseSettings):
 
     # ArgoCD Config defaults
     ARGOCD_SERVER: str = "localhost"
-    ARGOCD_PORT: str = "<ARGOCD_PORT>"
+    ARGOCD_PORT: str = "8080"
     ARGOCD_URL: str = f"{ARGOCD_SERVER}:{ARGOCD_PORT}"
-    ARGOCD_PASSWORD: str = "<ARGOCD_ADMIN_USER_PASSWORD>"
+    ARGOCD_PASSWORD: str = "i8mqaogfFr5arh1b"
     ARGOCD_USERNAME: str = "admin"                              # default argocd user
     TOKEN_CACHE_TTL: int = 600
 

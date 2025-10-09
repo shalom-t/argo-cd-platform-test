@@ -11,7 +11,7 @@ logger = setup_logger()
 logger.debug(f"Running with config: {settings}")
 
 
-def get_applcation():
+def get_application():
     _app = FastAPI(title=settings.FASTAPI_PROJECT_NAME)  
     _app.add_middleware(
         CORSMiddleware,
@@ -23,7 +23,7 @@ def get_applcation():
     return _app
 
 
-app = get_applcation()
+app = get_application()
 app.include_router(api.router)
 
 
@@ -34,7 +34,6 @@ async def healthcheck() -> HealthCheckResponse:
         status_code=status.HTTP_200_OK,
         message="Server is runing!"
     )
-
 
 if __name__ == "__main__":
     uvicorn.run("my_service.main:app", port=9000)

@@ -3,6 +3,8 @@ from my_service.models.models import ArgoCDCreds
 import aiohttp
 from cachetools import TTLCache
 from my_service.utils.logger import setup_logger
+import time
+import jwt as pyjwt
 
 creds = ArgoCDCreds(
     username=settings.ARGOCD_USERNAME,
@@ -11,7 +13,7 @@ creds = ArgoCDCreds(
 
 logger = setup_logger()
 token_cache = TTLCache(maxsize=1, ttl=settings.TOKEN_CACHE_TTL)
-
+logger.debug(f"Token cache: {token_cache}")
 
 async def fetch_argocd_token():
     """Fetch JWT token from ArgoCD and store it with TTL based on expiration."""
@@ -28,17 +30,20 @@ async def fetch_argocd_token():
                 verify_ssl=False,
         ) as resp:
             data = await resp.json()
+            logger.debug(f"ArgoCD data: {data}")
             token = data.get("token")
             if token:
                 logger.debug(
                     f"ArgoCD session token has been successfully, setting up cache TTL")
                 try:
-                    decoded = jwt.decode(
+                    decoded = pyjwt.decode(
                         token, options={"verify_signature": False})
                     exp = decoded.get("exp", int(
                         time.time()) + settings.TOKEN_CACHE_TTL)
                     ttl = max(exp - int(time.time()) - 10, 60)
-                except Exception:
+                    logger.debug(f"ArgoCD token TTL: {ttl}")
+                except Exception as e:
+                    logger.error(f"Error decoding ArgoCD token: {e}")
                     ttl = settings.TOKEN_CACHE_TTL
                 token_cache.clear()
                 token_cache[token] = ttl
