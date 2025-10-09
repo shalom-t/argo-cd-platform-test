@@ -5,7 +5,7 @@ kind: Kustomization
 
 # Default namespace for all resources defined in this kustomization
 # All resources (deployment, service, ingress) will be created in the "my-service" namespace
-namespace: my-service
+namespace: default
 
 # List of Kubernetes resource files to include in this kustomization
 # These files will be combined and deployed together as a single application

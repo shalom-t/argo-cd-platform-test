@@ -27,7 +27,7 @@ spec:
           image: my-service:latest
           # Ports that the container exposes
           ports:
-            - containerPort: 9000
+            - containerPort: 80
           # Always pull the latest image
           imagePullPolicy: Always
           # Environment variables for the container
