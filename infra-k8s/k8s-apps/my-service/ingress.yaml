@@ -20,6 +20,6 @@ spec:
       # Backend services to route the matched traffic to
       services:
         # Routes to the nginx-service defined in service.yaml
-        - name: my-service-service
+        - name: my-service
           # Port on the service to send traffic to
           port: 80

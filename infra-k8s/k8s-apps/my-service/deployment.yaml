@@ -4,8 +4,6 @@ kind: Deployment
 metadata:
   # Name of the deployment resource
   name: my-service
-  labels:
-    app: my-service
 spec:
   # Number of pod replicas to maintain - Kubernetes will ensure 1 pod is always running
   replicas: 1
@@ -29,7 +27,7 @@ spec:
           ports:
             - containerPort: 80
           # Always pull the latest image
-          imagePullPolicy: Always
+          # imagePullPolicy: Always
           # Environment variables for the container
           # env:
           #   # Port for the container

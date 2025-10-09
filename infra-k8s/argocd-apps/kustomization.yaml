@@ -12,11 +12,3 @@ resources:
   - nginx-application.yaml
   # My Service application deployment via GitOps
   - my-service-application.yaml
-
-# Common labels for all ArgoCD applications
-labels:
-  - pairs:
-      # Indicates this is managed by ArgoCD GitOps
-      managed-by: argocd
-      # Application type
-      app-type: argocd-application
