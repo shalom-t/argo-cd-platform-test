@@ -1,0 +1,32 @@
+# Kustomization for Superset installation via Helm chart
+# Follows the same pattern as ArgoCD installation
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# All resources will be created in the superset namespace
+namespace: superset
+
+# Standard Kubernetes resources to include
+resources:
+  # Creates the superset namespace before installing the chart
+  - namespace.yaml
+  # Traefik IngressRoute for external access
+  - ingress.yaml
+
+# Helm chart installations managed by Kustomize
+# Note: Requires kubectl with Helm chart inflation support
+helmCharts:
+  # Superset Helm chart configuration
+  - name: superset
+    # Include Custom Resource Definitions if any
+    includeCRDs: true
+    # Target namespace for the Helm release
+    namespace: superset
+    # Helm release name (how it appears in 'helm list')
+    releaseName: superset
+    # Official Apache Superset Helm chart repository
+    repo: https://apache.github.io/superset
+    # Custom values file for chart configuration
+    valuesFile: values.yaml
+    # Specific chart version to install (pinned for reproducibility)
+    version: 0.12.11

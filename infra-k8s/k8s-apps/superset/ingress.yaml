@@ -1,0 +1,16 @@
+# Traefik IngressRoute for Superset
+# Exposes Superset at superset.local:8080
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: superset
+  namespace: superset
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`superset.local`)
+      kind: Rule
+      services:
+        - name: superset
+          port: 8088

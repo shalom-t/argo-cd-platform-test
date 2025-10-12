@@ -12,3 +12,9 @@ namespace: default
 resources:
   # Creates the my-service deployment with 1 replica
   - deployment.yaml
+  # Creates the my-service configmap
+  # - configmap.yaml
+  # Creates the my-service ClusterIP service
+  - service.yaml
+  # Creates the Traefik IngressRoute for external access
+  - ingress.yaml

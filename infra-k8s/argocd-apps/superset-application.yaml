@@ -1,0 +1,47 @@
+# ArgoCD Application - GitOps deployment configuration for Superset
+# This defines how ArgoCD should deploy and manage the Superset application
+# Follows the same pattern as other applications (nginx, my-service)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  # Name of the ArgoCD application (visible in ArgoCD UI)
+  name: superset
+  namespace: argocd
+  # Finalizers ensure proper cleanup when the application is deleted
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  # GitOps source configuration - where to find the Kubernetes manifests
+  source:
+    # Git repository URL containing the manifests
+    repoURL: https://github.com/shalom-t/argo-cd-platform-test.git
+    # Git branch to track
+    targetRevision: main
+    # Path to Superset manifests (contains kustomization.yaml with helmCharts)
+    path: infra-k8s/k8s-apps/superset
+  
+  # Target cluster and namespace configuration
+  destination:
+    # Cluster URL - in-cluster means the same cluster where ArgoCD is running
+    server: https://kubernetes.default.svc
+    # Target namespace where the application will be deployed
+    namespace: superset
+  
+  # Project configuration - 'default' is the built-in ArgoCD project
+  project: default
+  
+  # Sync policy configuration
+  syncPolicy:
+    automated:
+      # Automatically remove resources when they're removed from Git
+      prune: true
+      # Automatically apply changes when Git repository is updated
+      selfHeal: true
+    # Sync options for fine-tuning behavior
+    syncOptions:
+      # Create namespace if it doesn't exist
+      - CreateNamespace=true
+      # Validate resources before applying them
+      - Validate=true
+      # Delete resources last during pruning (safer for dependencies)
+      - PruneLast=true

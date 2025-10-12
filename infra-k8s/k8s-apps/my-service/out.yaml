@@ -1,0 +1,61 @@
+apiVersion: v1
+data:
+  ARGOCD_PORT: "443"
+  ARGOCD_SERVER: argocd-server.argocd.svc.cluster.local
+kind: ConfigMap
+metadata:
+  name: my-service-config
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+  namespace: default
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: my-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-service
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-service
+  template:
+    metadata:
+      labels:
+        app: my-service
+    spec:
+      containers:
+      - image: my-service:latest
+        imagePullPolicy: Never
+        name: my-service
+        ports:
+        - containerPort: 80
+      envFrom:
+      - configMapRef:
+          name: my-service-config
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: my-service-ingressroute
+  namespace: default
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: Host(`my-service.local`)
+    services:
+    - name: my-service
+      port: 80

@@ -1,0 +1,7 @@
+# This file defines a Kubernetes Namespace named "superset".
+# Namespaces in Kubernetes provide a way to divide cluster resources between multiple users or applications.
+# Creating a namespace is often the first step before deploying applications, as it provides an isolated environment within the cluster.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: superset

@@ -1,0 +1,116 @@
+#############################################
+# Superset helm chart additional values file #
+#############################################
+
+# Service configuration
+service:
+  # Service type is ClusterIP
+  # Reason: Exposes Superset service internally within the Kubernetes cluster.
+  # This is typical for applications accessed behind an ingress or reverse proxy,
+  # instead of direct external access.
+  type: ClusterIP
+  # Port where Superset listens internally
+  # Reason: Superset's default web server runs on 8088.
+  port: 8088 # 8088 is the default port for Superset
+
+# Bootstrap and initialize Superset database and admin user
+init:
+  # When enabled, Helm will create a Kubernetes Job to initialize Superset.
+  # The Job runs database migrations and creates the initial admin user.
+  # This is controlled by this 'enabled' flag.
+  enabled: true
+  adminUser:
+    # These values are passed as environment variables to the init Job.
+    # Superset's init script uses them to create the admin user.
+    # Superset Application user layer creation
+    username: admin 
+    firstname: Superset
+    lastname: Admin
+    email: admin@superset.local
+    password: admin1234
+
+# PostgreSQL for metadata storage
+postgresql:
+  # Enables the embedded PostgreSQL database
+  # Reason: Superset needs a database to store its metadata (users, dashboards, etc.).
+  enabled: true
+  auth: 
+    # existingSecret: supersetsupersetsuperset
+    # Database username
+    # Reason: Used by Superset to connect to the PostgreSQL DB.
+    username: shalom
+    # Database password
+    # Reason: Password for DB connection; should be secured.
+    password: shalom123!@#
+    # Name of the PostgreSQL database to use
+    # Reason: Keeps Superset metadata in a dedicated named database for clarity and separation.
+    database: shalom
+  primary:
+    persistence:
+      # Persist data between pod restarts/rescheduling
+      # Reason: Prevents data loss by using persistent storage for PostgreSQL.
+      enabled: true
+      # Size of the persistent volume claim
+      # Reason: Allocates enough storage for metadata; 8Gi is a practical value for dev/test.
+      size: 8Gi
+
+# Redis for caching and Celery
+redis:
+  # Enables embedded Redis
+  # Reason: Used for caching and as a message broker for Celery workers (async tasks).
+  enabled: true
+  auth:
+    enabled: true
+    password: shalom123!@#
+  master:
+    persistence:
+      # Enable persistent storage for Redis master
+      # Reason: Prevents loss of cached state or Celery tasks on pod restarts.
+      enabled: true
+      # Size of the persistent volume claim
+      # Reason: Allocates storage for Redis data. 8Gi is typical for moderate workloads.
+      size: 8Gi
+
+# Resource limits for k3d cluster
+resources:
+  requests:
+    # Minimal CPU guaranteed for Superset pod
+    # Reason: Ensures the pod always has 100m (0.1 CPU) available on the node.
+    cpu: 100m
+    # Minimal memory guaranteed for Superset pod
+    # Reason: Ensures the pod has enough memory to avoid out-of-memory errors.
+    memory: 512Mi
+  limits:
+    # Max CPU available to the Superset pod
+    # Reason: Prevents the pod from using more than 1 CPU core.
+    cpu: 1000m
+    # Max memory for the pod
+    # Reason: Prevents pod from consuming more than 1Gi memory, protecting the node from overuse.
+    memory: 1Gi
+
+# Additional worker resources
+supersetWorker:
+  resources:
+    requests:
+      # CPU guaranteed for Celery worker pods
+      # Reason: Ensures stable resource allocation for background task processing.
+      cpu: 100m
+      # Minimal memory guaranteed for worker pods.
+      memory: 512Mi
+    limits:
+      # Max CPU for worker pods
+      cpu: 500m
+      # Max memory for worker pods
+      memory: 1Gi
+
+# Disable default ingress (using Traefik IngressRoute instead)
+ingress:
+  # Disables the default ingress created by the Helm chart
+  # Reason: Allows using a custom IngressRoute (Traefik) defined elsewhere in the deployment.
+  enabled: false
+
+# Security context
+# Run pod as root user (UID 0)
+# Reason: Sometimes necessary for custom images or needing special permissions,
+# but generally consider using a non-root user for better security.
+runAsUser: 0
