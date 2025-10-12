@@ -19,6 +19,12 @@ spec:
     targetRevision: main
     # Path to Superset manifests (contains kustomization.yaml with helmCharts)
     path: infra-k8s/k8s-apps/superset
+    # Kustomize-specific configuration
+    # Required when using Helm chart inflation in Kustomize
+    kustomize:
+      # Enable Helm chart inflation support
+      # This tells ArgoCD to pass --enable-helm to kustomize build
+      enableHelm: true
   
   # Target cluster and namespace configuration
   destination:
