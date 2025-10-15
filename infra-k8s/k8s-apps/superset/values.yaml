@@ -31,14 +31,20 @@ init:
 
 # PostgreSQL for metadata storage
 postgresql:
+  # Enables the embedded PostgreSQL database
+  # Reason: Superset needs a database to store its metadata (users, dashboards, etc.).
+  enabled: true
   # To overwrite the image 
   image:
     registry: docker.io
     repository: bitnami/postgresql
     tag: 16.4.0-debian-12-r17
-  # Enables the embedded PostgreSQL database
-  # Reason: Superset needs a database to store its metadata (users, dashboards, etc.).
-  enabled: true
+  primary:
+    image:
+      registry: docker.io
+      repository: bitnami/postgresql
+      tag: 16.4.0-debian-12-r17
+  
   auth: 
     # existingSecret: supersetsupersetsuperset
     # Database username
