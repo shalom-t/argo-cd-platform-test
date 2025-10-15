@@ -7,11 +7,11 @@ kind: Kustomization
 namespace: superset
 
 # Standard Kubernetes resources to include
-resources:
+# resources:
   # Creates the superset namespace before installing the chart
-  - namespace.yaml
+  # - namespace.yaml
   # Traefik IngressRoute for external access
-  - ingress.yaml
+  # - ingress.yaml
 
 # Helm chart installations managed by Kustomize
 # Note: Requires kubectl with Helm chart inflation support

@@ -5,11 +5,12 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   # Name of the ArgoCD application (visible in ArgoCD UI)
-  name: superset
   namespace: argocd
+  name: superset
   # Finalizers ensure proper cleanup when the application is deleted
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
+  # finalizers:
+  #   - resources-finalizer.argocd.argoproj.io
+
 spec:
   # GitOps source configuration - where to find the Kubernetes manifests
   source:
@@ -18,13 +19,7 @@ spec:
     # Git branch to track
     targetRevision: main
     # Path to Superset manifests (contains kustomization.yaml with helmCharts)
-    path: infra-k8s/k8s-apps/superset
-    # Kustomize-specific configuration
-    # Required when using Helm chart inflation in Kustomize
-    kustomize:
-      # Enable Helm chart inflation support
-      # This tells ArgoCD to pass --enable-helm to kustomize build
-      enableHelm: true
+    path: infra-k8s/k8s-apps/superset 
   
   # Target cluster and namespace configuration
   destination:
