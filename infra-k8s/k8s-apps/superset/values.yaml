@@ -33,17 +33,7 @@ init:
 extraSecretEnv:
   SUPERSET_SECRET_KEY: QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ
 
-# Configuration overrides for additional Superset settings
-configOverrides:
-  superset_config.py: |
-    # Import SECRET_KEY from environment
-    import os
-    SECRET_KEY = os.environ.get('SUPERSET_SECRET_KEY')
-    
-    # Additional Superset configuration options
-    # ROW_LIMIT = 5000
-    # SUPERSET_WEBSERVER_TIMEOUT = 60
-    # WTF_CSRF_ENABLED = True
+
 # PostgreSQL for metadata storage
 postgresql:
   # To overwrite the image 
