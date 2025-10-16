@@ -29,17 +29,9 @@ init:
     email: admin@superset.local
     password: admin1234
 
-# Set SECRET_KEY via environment variable
-extraSecretEnv:
-  SUPERSET_SECRET_KEY: "QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ"
-
-# Tell superset_config.py to READ the environment variable
-# This is CRITICAL - without this, the env var is set but never used
 configOverrides:
   secret: |
-    import os
-    SECRET_KEY = os.environ.get('SUPERSET_SECRET_KEY')
-
+    SECRET_KEY = 'QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ'
 
 # PostgreSQL for metadata storage
 postgresql:
