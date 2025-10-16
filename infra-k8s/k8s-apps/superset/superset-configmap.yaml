@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: superset-config
-  namespace: superset
-data:
-  superset_config.py: |
-    SECRET_KEY = 'QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ'

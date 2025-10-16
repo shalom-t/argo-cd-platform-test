@@ -29,6 +29,19 @@ init:
     email: admin@superset.local
     password: admin1234
 
+# Configuration overrides for Superset
+# This creates a superset_config.py file with custom settings
+configOverrides:
+  superset_config.py: |
+    # Secret key for securely signing session cookies
+    SECRET_KEY = 'QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ'
+    
+    # Additional Superset configuration options
+    # Uncomment and modify as needed:
+    # ROW_LIMIT = 5000
+    # SUPERSET_WEBSERVER_TIMEOUT = 60
+    # WTF_CSRF_ENABLED = True
+
 # PostgreSQL for metadata storage
 postgresql:
   # To overwrite the image 
