@@ -29,19 +29,19 @@ init:
     email: admin@superset.local
     password: admin1234
 
-extraSecretEnv:
-  - name: SUPERSET_SECRET_KEY
-    valueFrom:
-      secretKeyRef:
-        name: superset-secretkey # The name of your custom secret
-        key: SUPERSET_SECRET_KEY  # The key within your custom secret
-        
+# Configuration overrides for Superset
+# This creates a superset_config.py file with custom settings
+configOverrides:
+  secret: |
+    SECRET_KEY: "QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ"
+
 # PostgreSQL for metadata storage
 postgresql:
   # To overwrite the image 
   image:
     registry: docker.io
     repository: bitnamisecure/postgresql
+
   auth: 
     # existingSecret: supersetsupersetsuperset
     # Database username
