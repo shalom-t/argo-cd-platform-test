@@ -38,7 +38,7 @@ postgresql:
   # To overwrite the image 
   image:
     registry: docker.io
-    repository: bitnamisecure/postgresql:16.4.0-debian-12-r17
+    repository: bitnamisecure/postgresql
     tag: 16.4.0-debian-12-r17
 
   auth: 
