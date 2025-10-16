@@ -39,7 +39,7 @@ postgresql:
   image:
     registry: docker.io
     repository: bitnamisecure/postgresql
-    tag: 16.4.0-debian-12-r17
+    tag: latest
 
   auth: 
     # existingSecret: supersetsupersetsuperset
