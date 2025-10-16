@@ -38,9 +38,8 @@ postgresql:
   # To overwrite the image 
   image:
     registry: docker.io
-    repository: bitnamisecure/postgresql
+    repository: bitnami/postgresql
     tag: latest
-
   auth: 
     # existingSecret: supersetsupersetsuperset
     # Database username
@@ -63,6 +62,10 @@ postgresql:
 
 # Redis for caching and Celery
 redis:
+  image:
+    registry: docker.io
+    repository: bitnami/redis
+    tag: latest
   # Enables embedded Redis
   # Reason: Used for caching and as a message broker for Celery workers (async tasks).
   enabled: true
