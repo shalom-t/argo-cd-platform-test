@@ -31,7 +31,7 @@ init:
 
 # Set SECRET_KEY via environment variable (the proper way)
 extraSecretEnv:
-  SECRET_KEY: QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ
+  SUPERSET_SECRET_KEY: "QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ"
 
 # Configuration overrides for Superset
 # This creates a superset_config.py file with custom settings
@@ -42,7 +42,7 @@ configOverrides:
     import logging
     
     logging.info("Tryign to set SECRET_KEY from environment variable")
-    EXPORT SECRET_KEY = os.environ.get('SUPERSET_SECRET_KEY')
+    SUPERSET_SECRET_KEY = os.environ.get('SUPERSET_SECRET_KEY')
     logging.info(f"Superset SECRET_KEY: {SECRET_KEY}")
     
     # Additional Superset configuration options
