@@ -32,7 +32,7 @@ init:
 # Set SECRET_KEY via environment variable (the proper way)
 configOverrides:
   secret: |
-    SECRET_KEY = QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ
+    SECRET_KEY = "QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ"
 
 # PostgreSQL for metadata storage
 postgresql:
