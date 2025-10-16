@@ -30,25 +30,9 @@ init:
     password: admin1234
 
 # Set SECRET_KEY via environment variable (the proper way)
-extraSecretEnv:
-  SUPERSET_SECRET_KEY: QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ
-
-# Configuration overrides for Superset
-# This creates a superset_config.py file with custom settings
 configOverrides:
-  superset_config.py: |
-    # Import SECRET_KEY from environment
-    import os
-    import logging
-    
-    logging.info("Tryign to set SECRET_KEY from environment variable")
-    SECRET_KEY = os.environ.get('SUPERSET_SECRET_KEY')
-    logging.info(f"Superset SECRET_KEY: {SECRET_KEY}")
-    
-    # Additional Superset configuration options
-    # ROW_LIMIT = 5000
-    # SUPERSET_WEBSERVER_TIMEOUT = 60
-    # WTF_CSRF_ENABLED = True
+  secret: |
+    SECRET_KEY = QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ
 
 # PostgreSQL for metadata storage
 postgresql:
