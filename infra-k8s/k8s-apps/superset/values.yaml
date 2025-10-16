@@ -33,7 +33,7 @@ init:
 # This creates a superset_config.py file with custom settings
 configOverrides:
   secret: |
-    SECRET_KEY: "QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ"
+    SECRET_KEY = "QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ"
 
 # PostgreSQL for metadata storage
 postgresql:
