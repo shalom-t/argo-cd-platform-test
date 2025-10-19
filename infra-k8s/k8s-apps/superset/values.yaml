@@ -57,6 +57,10 @@ postgresql:
     registry: docker.io
     repository: bitnami/postgresql
     tag: latest
+    # When in dev use:
+    # registry: 806137713344.dkr.ecr.eu-west-1.amazonaws.com
+    # repository: bitnami/postgresql
+    # tag: sha25672c84b3980dc0f90f5e5e4470554e8994d3d2a60f622318dd29ad23b3ebf5b44
   # Enable PostgreSQL (required for Superset metadata storage)
   enabled: true
 
@@ -84,12 +88,16 @@ postgresql:
 # Redis for caching and Celery task queue
 redis:
   image:
-    registry: 806137713344.dkr.ecr.eu-west-1.amazonaws.com
+    registry: docker.io
     repository: bitnami/redis
-    tag: sha256-142ab4d0c251bcf5466fffd33766350af718a6725cb926710be19fad00b2b035
+    tag: latest
+    # When in dev use:
+    # registry: 806137713344.dkr.ecr.eu-west-1.amazonaws.com
+    # repository: bitnami/redis
+    # tag: sha256-142ab4d0c251bcf5466fffd33766350af718a6725cb926710be19fad00b2b035
+
   # Enable Redis (required for Superset caching and async tasks)
   enabled: true
-
   # Redis authentication configuration
   auth:
     # Enable password authentication
