@@ -13,10 +13,9 @@ service:
   # Reason: Superset's default web server runs on 8088.
   port: 8088 # 8088 is the default port for Superset
 
-env:
+extraEnv:
   - name: EMAIL_NOTIFICATIONS
     value: "True"
-
   - name: SMTP_HOST
     value: "192.168.100.111" # 👈 your host IP
   - name: SMTP_PORT
