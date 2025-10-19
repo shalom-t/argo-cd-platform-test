@@ -84,9 +84,9 @@ postgresql:
 # Redis for caching and Celery task queue
 redis:
   image:
-    registry: docker.io
+    registry: 806137713344.dkr.ecr.eu-west-1.amazonaws.com
     repository: bitnami/redis
-    tag: latest
+    tag: sha256-142ab4d0c251bcf5466fffd33766350af718a6725cb926710be19fad00b2b035
   # Enable Redis (required for Superset caching and async tasks)
   enabled: true
 
