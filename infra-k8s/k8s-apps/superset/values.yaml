@@ -18,7 +18,7 @@ init:
   # When enabled, Helm will create a Kubernetes Job to initialize Superset.
   # The Job runs database migrations and creates the initial admin user.
   # This is controlled by this 'enabled' flag.
-  enabled: true
+  # enabled: true
   adminUser:
     # These values are passed as environment variables to the init Job.
     # Superset's init script uses them to create the admin user.
@@ -36,7 +36,7 @@ supersetNode:
     # Redis connection for caching and Celery
     redis_host: '{{ .Release.Name }}-redis-master'
     redis_port: "6379"
-    redis_password: superset
+    # redis_password: superset
     # PostgreSQL connection for metadata
     db_host: '{{ .Release.Name }}-postgresql'
     db_port: "5432"
@@ -74,7 +74,7 @@ postgresql:
     
     # Password for the PostgreSQL superuser (postgres)
     # Required for administrative tasks and initial setup
-    postgresPassword: superset123
+    # postgresPassword: superset123
   
   primary:
     persistence:
