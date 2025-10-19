@@ -46,6 +46,7 @@ postgresql:
     # existingSecret: supersetsupersetsuperset
     # Database username
     # Reason: Used by Superset to connect to the PostgreSQL DB.
+    postgresUsername: shalom123!@#  
     username: shalom
     # Database password
     # Reason: Password for DB connection; should be secured.
