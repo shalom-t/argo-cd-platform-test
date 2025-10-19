@@ -49,8 +49,8 @@ postgresql:
     username: superset
     # Database password
     # Reason: Password for DB connection; should be secured.
-    postgresPassword: superset
-    password: superset
+    postgresPassword: shalom123!@#  
+    password: shalom123!@#
     # Name of the PostgreSQL database to use
     # Reason: Keeps Superset metadata in a dedicated named database for clarity and separation.
     database: superset
