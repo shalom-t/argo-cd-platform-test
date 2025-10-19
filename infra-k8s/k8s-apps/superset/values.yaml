@@ -13,6 +13,25 @@ service:
   # Reason: Superset's default web server runs on 8088.
   port: 8088 # 8088 is the default port for Superset
 
+env:
+  - name: EMAIL_NOTIFICATIONS
+    value: "True"
+
+  - name: SMTP_HOST
+    value: "192.168.100.111" # 👈 your host IP
+  - name: SMTP_PORT
+    value: "1025"
+  - name: SMTP_STARTTLS
+    value: "False" # no TLS for local debug server
+  - name: SMTP_SSL
+    value: "False"
+  - name: SMTP_USER
+    value: ""
+  - name: SMTP_PASSWORD
+    value: ""
+  - name: SMTP_MAIL_FROM
+    value: "superset@test.local"
+
 # Bootstrap and initialize Superset database and admin user
 init:
   # When enabled, Helm will create a Kubernetes Job to initialize Superset.
