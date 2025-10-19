@@ -13,7 +13,8 @@ service:
   # Reason: Superset's default web server runs on 8088.
   port: 8088 # 8088 is the default port for Superset
 
-extraEnv:
+# Extra environment variables in RAW format
+extraEnvRaw:
   - name: EMAIL_NOTIFICATIONS
     value: "True"
   - name: SMTP_HOST
@@ -30,6 +31,8 @@ extraEnv:
     value: ""
   - name: SMTP_MAIL_FROM
     value: "superset@test.local"
+  - name: ENABLE_ALERTS_REPORTS
+    value: "True"
 
 # Bootstrap and initialize Superset database and admin user
 init:
@@ -54,7 +57,7 @@ supersetNode:
     # Redis connection for caching and Celery
     redis_host: "{{ .Release.Name }}-redis-headless"
     redis_port: "6379"
-    # redis_password: superset
+    redis_password: superset
     # PostgreSQL connection for metadata
     db_host: "{{ .Release.Name }}-postgresql"
     db_port: "5432"
@@ -67,6 +70,28 @@ configOverrides:
   # Reason: Prevents the UI from freezing when displaying large datasets.
   secret: |
     SECRET_KEY = 'QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ'
+  
+  # Email configuration for alerts and reports
+  email_config: |
+    import os
+    
+    # Enable email notifications and alerts/reports feature
+    EMAIL_NOTIFICATIONS = True
+    FEATURE_FLAGS = {
+        "ALERT_REPORTS": True,
+    }
+    
+    # SMTP Configuration
+    SMTP_HOST = os.getenv('SMTP_HOST', '192.168.100.111')
+    SMTP_PORT = int(os.getenv('SMTP_PORT', '1025'))
+    SMTP_STARTTLS = os.getenv('SMTP_STARTTLS', 'False') == 'True'
+    SMTP_SSL = os.getenv('SMTP_SSL', 'False') == 'True'
+    SMTP_USER = os.getenv('SMTP_USER', '')
+    SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
+    SMTP_MAIL_FROM = os.getenv('SMTP_MAIL_FROM', 'superset@test.local')
+    
+    # Optional: Email subject prefix
+    EMAIL_REPORTS_SUBJECT_PREFIX = "[Superset] "
 
 # PostgreSQL for metadata storage
 postgresql:
