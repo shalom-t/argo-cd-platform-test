@@ -42,47 +42,55 @@ postgresql:
     registry: docker.io
     repository: bitnami/postgresql
     tag: latest
-  auth: 
-    # existingSecret: supersetsupersetsuperset
-    # Database username
-    # Reason: Used by Superset to connect to the PostgreSQL DB.
-    postgresUsername: shalom123!@#  
-    username: shalom
-    # Database password
-    # Reason: Password for DB connection; should be secured.
-    postgresPassword: shalom123!@#  
-    password: shalom123!@#
-    # Name of the PostgreSQL database to use
-    # Reason: Keeps Superset metadata in a dedicated named database for clarity and separation.
+  # Enable PostgreSQL (required for Superset metadata storage)
+  enabled: true
+  
+  auth:
+    # Username for the application database user (used by Superset to connect)
+    # This creates a non-superuser account for Superset
+    username: superset
+    
+    # Password for the application user
+    password: superset
+    
+    # Database name to create for Superset
+    # Superset will store its metadata (dashboards, users, etc.) here
     database: superset
+    
+    # Password for the PostgreSQL superuser (postgres)
+    # Required for administrative tasks and initial setup
+    postgresPassword: superset123
+  
   primary:
     persistence:
-      # Persist data between pod restarts/rescheduling
-      # Reason: Prevents data loss by using persistent storage for PostgreSQL.
+      # Enable persistent storage for PostgreSQL data
+      # Prevents data loss when pods restart
       enabled: true
-      # Size of the persistent volume claim
-      # Reason: Allocates enough storage for metadata; 8Gi is a practical value for dev/test.
+      
+      # Size of the persistent volume
       size: 8Gi
 
-# Redis for caching and Celery
+# Redis for caching and Celery task queue
 redis:
   image:
     registry: docker.io
     repository: bitnami/redis
     tag: latest
-  # Enables embedded Redis
-  # Reason: Used for caching and as a message broker for Celery workers (async tasks).
+  # Enable Redis (required for Superset caching and async tasks)
   enabled: true
+  
   auth:
+    # Enable password authentication
     enabled: true
+    # Password for Redis
     password: superset
+  
   master:
     persistence:
-      # Enable persistent storage for Redis master
-      # Reason: Prevents loss of cached state or Celery tasks on pod restarts.
+      # Enable persistent storage for Redis data
+      # Stores cached data and Celery task queue across restarts
       enabled: true
-      # Size of the persistent volume claim
-      # Reason: Allocates storage for Redis data. 8Gi is typical for moderate workloads.
+      # Size of the persistent volume
       size: 8Gi
 
 # Resource limits for k3d cluster
