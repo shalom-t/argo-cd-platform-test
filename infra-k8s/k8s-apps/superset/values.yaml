@@ -114,6 +114,9 @@ configOverrides:
   
   # Celery configuration for async queries
   celery: |
+    # JWT secret for async query authentication (must be at least 32 bytes)
+    ASYNC_QUERY_JWT_SECRET = 'edc1ZJTIrfHN4a5Y3K7mP9qR2wS8vU0x'
+    
     # Enable async query execution
     FEATURE_FLAGS = {
         'GLOBAL_ASYNC_QUERIES': True,
@@ -153,9 +156,6 @@ configOverrides:
     # SQL Lab async configuration
     SQLLAB_ASYNC_TIME_LIMIT_SEC = 300  # Must match CELERY_TASK_TIME_LIMIT
     SQLLAB_TIMEOUT = 300
-    
-    # JWT secret for async query authentication
-    ASYNC_QUERY_JWT_SECRET = '24GhDAEXvuNeOOZUsEhlCHqUDNDeNo52sRBiMeM63zepY75F0vu1n7NO'
   
   # Custom security manager for user registration emails
   custom_security: |
