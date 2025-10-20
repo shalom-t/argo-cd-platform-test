@@ -84,18 +84,19 @@ configOverrides:
   # Custom security manager for user registration emails
   custom_security: |
     import os
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
     from superset.security import SupersetSecurityManager
-    from flask import Flask
-    from flask_mail import Mail, Message
     
     # SMTP/Email Configuration
-    MAIL_SERVER = os.getenv('SMTP_HOST', '192.168.100.111')
-    MAIL_PORT = int(os.getenv('SMTP_PORT', '1025'))
-    MAIL_USE_TLS = os.getenv('SMTP_STARTTLS', 'False') == 'True'
-    MAIL_USE_SSL = os.getenv('SMTP_SSL', 'False') == 'True'
-    MAIL_USERNAME = os.getenv('SMTP_USER', '')
-    MAIL_PASSWORD = os.getenv('SMTP_PASSWORD', '')
-    MAIL_DEFAULT_SENDER = os.getenv('SMTP_MAIL_FROM', 'superset@test.local')
+    SMTP_HOST = os.getenv('SMTP_HOST', '192.168.100.111')
+    SMTP_PORT = int(os.getenv('SMTP_PORT', '1025'))
+    SMTP_STARTTLS = os.getenv('SMTP_STARTTLS', 'False') == 'True'
+    SMTP_SSL = os.getenv('SMTP_SSL', 'False') == 'True'
+    SMTP_USER = os.getenv('SMTP_USER', '')
+    SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
+    SMTP_MAIL_FROM = os.getenv('SMTP_MAIL_FROM', 'superset@test.local')
     
     # Custom Security Manager to send emails on user creation
     class CustomSecurityManager(SupersetSecurityManager):
@@ -115,15 +116,14 @@ configOverrides:
             # Send welcome email if user was created successfully
             if user:
                 try:
-                    from flask_mail import Mail, Message
-                    from flask import current_app
+                    # Create email message
+                    msg = MIMEMultipart()
+                    msg['Subject'] = "Welcome to Superset!"
+                    msg['From'] = SMTP_MAIL_FROM
+                    msg['To'] = email
                     
-                    mail = Mail(current_app)
-                    msg = Message(
-                        subject="Welcome to Superset!",
-                        recipients=[email],
-                        body=f"""
-    Hello {first_name or username},
+                    # Email body
+                    body = f"""Hello {first_name or username},
     
     Your Superset account has been created successfully!
     
@@ -138,8 +138,23 @@ configOverrides:
     Best regards,
     The Superset Team
     """
-                    )
-                    mail.send(msg)
+                    msg.attach(MIMEText(body, 'plain'))
+                    
+                    # Send email using SMTP
+                    if SMTP_SSL:
+                        server = smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT)
+                    else:
+                        server = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
+                    
+                    if SMTP_STARTTLS:
+                        server.starttls()
+                    
+                    if SMTP_USER and SMTP_PASSWORD:
+                        server.login(SMTP_USER, SMTP_PASSWORD)
+                    
+                    server.send_message(msg)
+                    server.quit()
+                    
                     print(f"✅ Welcome email sent to {email}")
                 except Exception as e:
                     print(f"❌ Failed to send welcome email to {email}: {str(e)}")
