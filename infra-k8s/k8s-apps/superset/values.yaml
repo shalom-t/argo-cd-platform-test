@@ -65,8 +65,11 @@ supersetNode:
     db_pass: superset
     db_name: superset
 
+supersetCeleryBeat:
+  enabled: true
+
 configOverrides:
-  # Set the row limit to 1000
+  # Superset specific config
   # Reason: Prevents the UI from freezing when displaying large datasets.
   secret: |
     SECRET_KEY = 'QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ'
@@ -93,6 +96,10 @@ configOverrides:
     
     # Optional: Email subject prefix
     EMAIL_REPORTS_SUBJECT_PREFIX = "[Superset] "
+
+    # row limiter
+    ROW_LIMIT: 5000
+
 
 # PostgreSQL for metadata storage
 postgresql:
