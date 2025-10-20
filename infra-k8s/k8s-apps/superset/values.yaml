@@ -13,6 +13,10 @@ service:
   # Reason: Superset's default web server runs on 8088.
   port: 8088 # 8088 is the default port for Superset
 
+# Extra environment variables (key-value format)
+# Note: ROW_LIMIT is set in configOverrides.secret below (Superset Python config)
+extraEnv: {}
+
 # Extra environment variables in RAW format
 extraEnvRaw:
   - name: EMAIL_NOTIFICATIONS
@@ -65,40 +69,87 @@ supersetNode:
     db_pass: superset
     db_name: superset
 
+# Celery Beat - not needed for user registration emails, but keep for future use
 supersetCeleryBeat:
   enabled: true
 
 configOverrides:
-  # Superset specific config
-  # Reason: Prevents the UI from freezing when displaying large datasets.
+  # Secret key for encryption
   secret: |
     SECRET_KEY = 'QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ'
+    
+    # Query row limit
+    ROW_LIMIT = 5000
   
-  # Email configuration for alerts and reports
-  email_config: |
+  # Custom security manager for user registration emails
+  custom_security: |
     import os
+    from superset.security import SupersetSecurityManager
+    from flask import Flask
+    from flask_mail import Mail, Message
     
-    # Enable email notifications and alerts/reports feature
-    EMAIL_NOTIFICATIONS = True
-    ALERT_REPORTS = True
-    FEATURE_FLAGS = {
-        "ALERT_REPORTS": True,
-    }
+    # SMTP/Email Configuration
+    MAIL_SERVER = os.getenv('SMTP_HOST', '192.168.100.111')
+    MAIL_PORT = int(os.getenv('SMTP_PORT', '1025'))
+    MAIL_USE_TLS = os.getenv('SMTP_STARTTLS', 'False') == 'True'
+    MAIL_USE_SSL = os.getenv('SMTP_SSL', 'False') == 'True'
+    MAIL_USERNAME = os.getenv('SMTP_USER', '')
+    MAIL_PASSWORD = os.getenv('SMTP_PASSWORD', '')
+    MAIL_DEFAULT_SENDER = os.getenv('SMTP_MAIL_FROM', 'superset@test.local')
     
-    # SMTP Configuration
-    SMTP_HOST = os.getenv('SMTP_HOST', '192.168.100.111')
-    SMTP_PORT = int(os.getenv('SMTP_PORT', '1025'))
-    SMTP_STARTTLS = os.getenv('SMTP_STARTTLS', 'False') == 'True'
-    SMTP_SSL = os.getenv('SMTP_SSL', 'False') == 'True'
-    SMTP_USER = os.getenv('SMTP_USER', '')
-    SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
-    SMTP_MAIL_FROM = os.getenv('SMTP_MAIL_FROM', 'superset@test.local')
+    # Custom Security Manager to send emails on user creation
+    class CustomSecurityManager(SupersetSecurityManager):
+        def add_user(self, username, first_name, last_name, email, role, password='', hashed_password=''):
+            """Override add_user to send welcome email"""
+            # Call parent method to actually create the user
+            user = super().add_user(
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                role=role,
+                password=password,
+                hashed_password=hashed_password
+            )
+            
+            # Send welcome email if user was created successfully
+            if user:
+                try:
+                    from flask_mail import Mail, Message
+                    from flask import current_app
+                    
+                    mail = Mail(current_app)
+                    msg = Message(
+                        subject="Welcome to Superset!",
+                        recipients=[email],
+                        body=f"""
+    Hello {first_name or username},
     
-    # Optional: Email subject prefix
-    EMAIL_REPORTS_SUBJECT_PREFIX = "[Superset] "
-
-    # row limiter
-    ROW_LIMIT: 5000
+    Your Superset account has been created successfully!
+    
+    Username: {username}
+    Email: {email}
+    Role: {role.name if hasattr(role, 'name') else role}
+    
+    You can log in at: http://superset.local:8088
+    
+    Enjoy exploring your data!
+    
+    Best regards,
+    The Superset Team
+    """
+                    )
+                    mail.send(msg)
+                    print(f"✅ Welcome email sent to {email}")
+                except Exception as e:
+                    print(f"❌ Failed to send welcome email to {email}: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
+            
+            return user
+    
+    # Register custom security manager
+    CUSTOM_SECURITY_MANAGER = CustomSecurityManager
 
 
 # PostgreSQL for metadata storage
