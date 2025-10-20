@@ -153,6 +153,9 @@ configOverrides:
     # SQL Lab async configuration
     SQLLAB_ASYNC_TIME_LIMIT_SEC = 300  # Must match CELERY_TASK_TIME_LIMIT
     SQLLAB_TIMEOUT = 300
+    
+    # JWT secret for async query authentication
+    ASYNC_QUERY_JWT_SECRET = '24GhDAEXvuNeOOZUsEhlCHqUDNDeNo52sRBiMeM63zepY75F0vu1n7NO'
   
   # Custom security manager for user registration emails
   custom_security: |
