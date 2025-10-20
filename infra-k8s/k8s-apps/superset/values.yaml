@@ -89,140 +89,140 @@ configOverrides:
     ENABLE_PROXY_FIX = True
   
   # Custom security manager for user registration emails
-  custom_security: |
-    import os
-    import smtplib
-    import logging
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-    from superset.security import SupersetSecurityManager
-    from sqlalchemy import event
+  # custom_security: |
+  #   import os
+  #   import smtplib
+  #   import logging
+  #   from email.mime.text import MIMEText
+  #   from email.mime.multipart import MIMEMultipart
+  #   from superset.security import SupersetSecurityManager
+  #   from sqlalchemy import event
     
-    # Setup logging
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
+  #   # Setup logging
+  #   logger = logging.getLogger(__name__)
+  #   logger.setLevel(logging.INFO)
     
-    # SMTP/Email Configuration
-    SMTP_HOST = os.getenv('SMTP_HOST', '192.168.100.111')
-    SMTP_PORT = int(os.getenv('SMTP_PORT', '1025'))
-    SMTP_STARTTLS = os.getenv('SMTP_STARTTLS', 'False') == 'True'
-    SMTP_SSL = os.getenv('SMTP_SSL', 'False') == 'True'
-    SMTP_USER = os.getenv('SMTP_USER', '')
-    SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
-    SMTP_MAIL_FROM = os.getenv('SMTP_MAIL_FROM', 'superset@test.local')
+  #   # SMTP/Email Configuration
+  #   SMTP_HOST = os.getenv('SMTP_HOST', '192.168.100.111')
+  #   SMTP_PORT = int(os.getenv('SMTP_PORT', '1025'))
+  #   SMTP_STARTTLS = os.getenv('SMTP_STARTTLS', 'False') == 'True'
+  #   SMTP_SSL = os.getenv('SMTP_SSL', 'False') == 'True'
+  #   SMTP_USER = os.getenv('SMTP_USER', '')
+  #   SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
+  #   SMTP_MAIL_FROM = os.getenv('SMTP_MAIL_FROM', 'superset@test.local')
 
-    # Enable password reset functionality
-    ENABLE_PASSWORD_RESET = True
+  #   # Enable password reset functionality
+  #   ENABLE_PASSWORD_RESET = True
     
-    logger.info(f"📧 Email configuration loaded: SMTP_HOST={SMTP_HOST}, SMTP_PORT={SMTP_PORT}")
-    print(f"📧 Email configuration loaded: SMTP_HOST={SMTP_HOST}, SMTP_PORT={SMTP_PORT}")
+  #   logger.info(f"📧 Email configuration loaded: SMTP_HOST={SMTP_HOST}, SMTP_PORT={SMTP_PORT}")
+  #   print(f"📧 Email configuration loaded: SMTP_HOST={SMTP_HOST}, SMTP_PORT={SMTP_PORT}")
     
-    def send_welcome_email(user):
-        """Send welcome email to new user"""
-        try:
-            username = user.username
-            first_name = user.first_name
-            last_name = user.last_name
-            email = user.email
-            password = user.password
-            roles = user.roles if hasattr(user, 'roles') else []
+  #   def send_welcome_email(user):
+  #       """Send welcome email to new user"""
+  #       try:
+  #           username = user.username
+  #           first_name = user.first_name
+  #           last_name = user.last_name
+  #           email = user.email
+  #           password = user.password
+  #           roles = user.roles if hasattr(user, 'roles') else []
             
-            if not email:
-                logger.warning(f"⚠️ No email address for user {username}, skipping email")
-                return False
+  #           if not email:
+  #               logger.warning(f"⚠️ No email address for user {username}, skipping email")
+  #               return False
             
-            logger.info(f"📨 Attempting to send welcome email to {email}")
-            print(f"📨 Attempting to send welcome email to {email}")
+  #           logger.info(f"📨 Attempting to send welcome email to {email}")
+  #           print(f"📨 Attempting to send welcome email to {email}")
             
-            # Create email message
-            msg = MIMEMultipart()
-            msg['Subject'] = "Welcome to Superset!"
-            msg['From'] = SMTP_MAIL_FROM
-            msg['To'] = email
+  #           # Create email message
+  #           msg = MIMEMultipart()
+  #           msg['Subject'] = "Welcome to Superset!"
+  #           msg['From'] = SMTP_MAIL_FROM
+  #           msg['To'] = email
             
-            # Email body
-            role_names = ', '.join([r.name for r in roles]) if roles else 'User'
-            body = f"""Hello {first_name or username},
+  #           # Email body
+  #           role_names = ', '.join([r.name for r in roles]) if roles else 'User'
+  #           body = f"""Hello {first_name or username},
     
-    Your Superset account has been created successfully!
+  #   Your Superset account has been created successfully!
     
-    Username: {username}
-    Email: {email}
-    Role(s): {role_names}
-    Initial assigned password: {password if password else 'N/A'}
+  #   Username: {username}
+  #   Email: {email}
+  #   Role(s): {role_names}
+  #   Initial assigned password: {password if password else 'N/A'}
     
-    You can log in at: http://superset.local:8088
+  #   You can log in at: http://superset.local:8088
     
-    Enjoy exploring your data!
+  #   Enjoy exploring your data!
     
-    Best regards,
-    The Superset Team
-    """
-            msg.attach(MIMEText(body, 'plain'))
+  #   Best regards,
+  #   The Superset Team
+  #   """
+  #           msg.attach(MIMEText(body, 'plain'))
             
-            # Send email using SMTP
-            logger.info(f"🔌 Connecting to SMTP server {SMTP_HOST}:{SMTP_PORT}")
-            print(f"🔌 Connecting to SMTP server {SMTP_HOST}:{SMTP_PORT}")
+  #           # Send email using SMTP
+  #           logger.info(f"🔌 Connecting to SMTP server {SMTP_HOST}:{SMTP_PORT}")
+  #           print(f"🔌 Connecting to SMTP server {SMTP_HOST}:{SMTP_PORT}")
             
-            if SMTP_SSL:
-                server = smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=10)
-            else:
-                server = smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10)
+  #           if SMTP_SSL:
+  #               server = smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=10)
+  #           else:
+  #               server = smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10)
             
-            if SMTP_STARTTLS and not SMTP_SSL:
-                logger.info("🔐 Starting TLS")
-                server.starttls()
+  #           if SMTP_STARTTLS and not SMTP_SSL:
+  #               logger.info("🔐 Starting TLS")
+  #               server.starttls()
             
-            if SMTP_USER and SMTP_PASSWORD:
-                logger.info(f"🔑 Logging in as {SMTP_USER}")
-                server.login(SMTP_USER, SMTP_PASSWORD)
+  #           if SMTP_USER and SMTP_PASSWORD:
+  #               logger.info(f"🔑 Logging in as {SMTP_USER}")
+  #               server.login(SMTP_USER, SMTP_PASSWORD)
             
-            server.send_message(msg)
-            server.quit()
+  #           server.send_message(msg)
+  #           server.quit()
             
-            logger.info(f"✅ Welcome email sent successfully to {email}")
-            print(f"✅ Welcome email sent to {email}")
-            return True
-        except Exception as e:
-            logger.error(f"❌ Failed to send welcome email: {str(e)}", exc_info=True)
-            print(f"❌ Failed to send welcome email: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            return False
+  #           logger.info(f"✅ Welcome email sent successfully to {email}")
+  #           print(f"✅ Welcome email sent to {email}")
+  #           return True
+  #       except Exception as e:
+  #           logger.error(f"❌ Failed to send welcome email: {str(e)}", exc_info=True)
+  #           print(f"❌ Failed to send welcome email: {str(e)}")
+  #           import traceback
+  #           traceback.print_exc()
+  #           return False
     
-    # Event listener for new user creation
-    def user_after_insert_listener(mapper, connection, target):
-        """Triggered when a new user is inserted into the database"""
-        logger.info(f"👤 SQLAlchemy event: User created - {target.username}")
-        print(f"👤 SQLAlchemy event: User created - {target.username}")
+  #   # Event listener for new user creation
+  #   def user_after_insert_listener(mapper, connection, target):
+  #       """Triggered when a new user is inserted into the database"""
+  #       logger.info(f"👤 SQLAlchemy event: User created - {target.username}")
+  #       print(f"👤 SQLAlchemy event: User created - {target.username}")
 
-        logger.info(f"\n👤 SQLAlchemy event: User password - {target.password}")
-        print(f"👤 SQLAlchemy event: User password - {target.password}")
+  #       logger.info(f"\n👤 SQLAlchemy event: User password - {target.password}")
+  #       print(f"👤 SQLAlchemy event: User password - {target.password}")
         
-        # Send email in background to avoid blocking the insert
-        try:
-            send_welcome_email(target)
-        except Exception as e:
-            logger.error(f"Error in user_after_insert_listener: {e}")
-            print(f"Error in user_after_insert_listener: {e}")
+  #       # Send email in background to avoid blocking the insert
+  #       try:
+  #           send_welcome_email(target)
+  #       except Exception as e:
+  #           logger.error(f"Error in user_after_insert_listener: {e}")
+  #           print(f"Error in user_after_insert_listener: {e}")
     
-    # Custom Security Manager
-    class CustomSecurityManager(SupersetSecurityManager):
-        def __init__(self, appbuilder):
-            super().__init__(appbuilder)
-            logger.info("🔧 CustomSecurityManager initialized!")
-            print("🔧 CustomSecurityManager initialized!")
+  #   # Custom Security Manager
+  #   class CustomSecurityManager(SupersetSecurityManager):
+  #       def __init__(self, appbuilder):
+  #           super().__init__(appbuilder)
+  #           logger.info("🔧 CustomSecurityManager initialized!")
+  #           print("🔧 CustomSecurityManager initialized!")
             
-            # Register SQLAlchemy event listener for User inserts
-            logger.info("🎯 Registering SQLAlchemy after_insert event for User model")
-            print("🎯 Registering SQLAlchemy after_insert event for User model")
-            event.listen(self.user_model, 'after_insert', user_after_insert_listener)
+  #           # Register SQLAlchemy event listener for User inserts
+  #           logger.info("🎯 Registering SQLAlchemy after_insert event for User model")
+  #           print("🎯 Registering SQLAlchemy after_insert event for User model")
+  #           event.listen(self.user_model, 'after_insert', user_after_insert_listener)
     
-    # Register custom security manager
-    CUSTOM_SECURITY_MANAGER = CustomSecurityManager
+  #   # Register custom security manager
+  #   CUSTOM_SECURITY_MANAGER = CustomSecurityManager
     
-    logger.info("✅ CustomSecurityManager registered")
-    print("✅ CustomSecurityManager registered in config")
+  #   logger.info("✅ CustomSecurityManager registered")
+  #   print("✅ CustomSecurityManager registered in config")
 
 
 # PostgreSQL for metadata storage
