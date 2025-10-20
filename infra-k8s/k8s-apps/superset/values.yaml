@@ -4,7 +4,7 @@
 
 # Image configuration - override default image tag
 image:
-  tag: 5.0.0
+  tag: 6.0.0rc2
 
 # Service configuration
 service:
@@ -227,6 +227,7 @@ configOverrides:
 
 # Bootstrap script - runs before Superset starts
 # Installs additional packages needed for Superset
+# This is need in order to use the Superser version 5.0.0 and Chart 0.15.0
 bootstrapScript: |
   #!/bin/bash
   apt update && apt install -y gcc libpq-dev python3-dev pkg-config
