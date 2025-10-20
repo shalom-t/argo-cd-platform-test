@@ -85,9 +85,14 @@ configOverrides:
   custom_security: |
     import os
     import smtplib
+    import logging
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
     from superset.security import SupersetSecurityManager
+    
+    # Setup logging
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
     
     # SMTP/Email Configuration
     SMTP_HOST = os.getenv('SMTP_HOST', '192.168.100.111')
@@ -98,10 +103,78 @@ configOverrides:
     SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
     SMTP_MAIL_FROM = os.getenv('SMTP_MAIL_FROM', 'superset@test.local')
     
+    logger.info(f"📧 Email configuration loaded: SMTP_HOST={SMTP_HOST}, SMTP_PORT={SMTP_PORT}")
+    
+    def send_welcome_email(username, first_name, last_name, email, role):
+        """Send welcome email to new user"""
+        try:
+            logger.info(f"📨 Attempting to send welcome email to {email}")
+            
+            # Create email message
+            msg = MIMEMultipart()
+            msg['Subject'] = "Welcome to Superset!"
+            msg['From'] = SMTP_MAIL_FROM
+            msg['To'] = email
+            
+            # Email body
+            role_name = role.name if hasattr(role, 'name') else str(role)
+            body = f"""Hello {first_name or username},
+    
+    Your Superset account has been created successfully!
+    
+    Username: {username}
+    Email: {email}
+    Role: {role_name}
+    
+    You can log in at: http://superset.local:8088
+    
+    Enjoy exploring your data!
+    
+    Best regards,
+    The Superset Team
+    """
+            msg.attach(MIMEText(body, 'plain'))
+            
+            # Send email using SMTP
+            logger.info(f"🔌 Connecting to SMTP server {SMTP_HOST}:{SMTP_PORT}")
+            if SMTP_SSL:
+                server = smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=10)
+            else:
+                server = smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10)
+            
+            if SMTP_STARTTLS and not SMTP_SSL:
+                logger.info("🔐 Starting TLS")
+                server.starttls()
+            
+            if SMTP_USER and SMTP_PASSWORD:
+                logger.info(f"🔑 Logging in as {SMTP_USER}")
+                server.login(SMTP_USER, SMTP_PASSWORD)
+            
+            server.send_message(msg)
+            server.quit()
+            
+            logger.info(f"✅ Welcome email sent successfully to {email}")
+            print(f"✅ Welcome email sent to {email}")
+            return True
+        except Exception as e:
+            logger.error(f"❌ Failed to send welcome email to {email}: {str(e)}", exc_info=True)
+            print(f"❌ Failed to send welcome email to {email}: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False
+    
     # Custom Security Manager to send emails on user creation
     class CustomSecurityManager(SupersetSecurityManager):
+        def __init__(self, appbuilder):
+            super().__init__(appbuilder)
+            logger.info("🔧 CustomSecurityManager initialized!")
+            print("🔧 CustomSecurityManager initialized!")
+        
         def add_user(self, username, first_name, last_name, email, role, password='', hashed_password=''):
             """Override add_user to send welcome email"""
+            logger.info(f"👤 add_user called for username={username}, email={email}")
+            print(f"👤 add_user called for username={username}, email={email}")
+            
             # Call parent method to actually create the user
             user = super().add_user(
                 username=username,
@@ -114,57 +187,16 @@ configOverrides:
             )
             
             # Send welcome email if user was created successfully
-            if user:
-                try:
-                    # Create email message
-                    msg = MIMEMultipart()
-                    msg['Subject'] = "Welcome to Superset!"
-                    msg['From'] = SMTP_MAIL_FROM
-                    msg['To'] = email
-                    
-                    # Email body
-                    body = f"""Hello {first_name or username},
-    
-    Your Superset account has been created successfully!
-    
-    Username: {username}
-    Email: {email}
-    Role: {role.name if hasattr(role, 'name') else role}
-    
-    You can log in at: http://superset.local:8088
-    
-    Enjoy exploring your data!
-    
-    Best regards,
-    The Superset Team
-    """
-                    msg.attach(MIMEText(body, 'plain'))
-                    
-                    # Send email using SMTP
-                    if SMTP_SSL:
-                        server = smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT)
-                    else:
-                        server = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
-                    
-                    if SMTP_STARTTLS:
-                        server.starttls()
-                    
-                    if SMTP_USER and SMTP_PASSWORD:
-                        server.login(SMTP_USER, SMTP_PASSWORD)
-                    
-                    server.send_message(msg)
-                    server.quit()
-                    
-                    print(f"✅ Welcome email sent to {email}")
-                except Exception as e:
-                    print(f"❌ Failed to send welcome email to {email}: {str(e)}")
-                    import traceback
-                    traceback.print_exc()
+            if user and email:
+                send_welcome_email(username, first_name, last_name, email, role)
             
             return user
     
     # Register custom security manager
     CUSTOM_SECURITY_MANAGER = CustomSecurityManager
+    
+    logger.info("✅ CustomSecurityManager registered")
+    print("✅ CustomSecurityManager registered in config")
 
 
 # PostgreSQL for metadata storage
