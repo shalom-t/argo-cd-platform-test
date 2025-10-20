@@ -224,13 +224,15 @@ configOverrides:
     logger.info("✅ CustomSecurityManager registered")
     print("✅ CustomSecurityManager registered in config")
 
-  bootstrapScript: |
-    #!/bin/bash
-    apt update && apt install -y gcc libpq-dev python3-dev pkg-config
-    echo "installing required libs"
-    uv pip install psycopg2-binary authlib
-    if [ ! -f ~/bootstrap ]; then echo "Running Superset with uid {{ .Values.runAsUser }}" > ~/bootstrap; fi
 
+# Bootstrap script - runs before Superset starts
+# Installs additional packages needed for Superset
+bootstrapScript: |
+  #!/bin/bash
+  apt update && apt install -y gcc libpq-dev python3-dev pkg-config
+  echo "installing required libs"
+  uv pip install psycopg2-binary authlib
+  if [ ! -f ~/bootstrap ]; then echo "Running Superset with uid {{ .Values.runAsUser }}" > ~/bootstrap; fi
 
 # PostgreSQL for metadata storage
 postgresql:
