@@ -84,7 +84,7 @@ configOverrides:
     # Enable proxy fix
     ENABLE_PROXY_FIX = True
   
-  # Custom security manager for user registration emails  
+  # Custom security manager for user registration emails
   custom_security: |
     import os
     import smtplib
@@ -92,7 +92,7 @@ configOverrides:
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
     from superset.security import SupersetSecurityManager
-    from flask_appbuilder.security.views import UserModelView
+    from sqlalchemy import event
     
     # Setup logging
     logger = logging.getLogger(__name__)
@@ -107,21 +107,25 @@ configOverrides:
     SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
     SMTP_MAIL_FROM = os.getenv('SMTP_MAIL_FROM', 'superset@test.local')
     
-    logger.info(f"📧 Email config SMTP_HOST={SMTP_HOST}, SMTP_PORT={SMTP_PORT}")
-    print(f"📧 Email config SMTP_HOST={SMTP_HOST}, SMTP_PORT={SMTP_PORT}")
+    logger.info(f"📧 Email configuration loaded: SMTP_HOST={SMTP_HOST}, SMTP_PORT={SMTP_PORT}")
+    print(f"📧 Email configuration loaded: SMTP_HOST={SMTP_HOST}, SMTP_PORT={SMTP_PORT}")
     
-    # Temporary storage for plain passwords before hashing
-    temp_passwords = {}
-    
-    def send_welcome_email(username, first_name, last_name, email, roles, plain_password):
-        """Send welcome email to new user with plain-text password"""
+    def send_welcome_email(user):
+        """Send welcome email to new user"""
         try:
+            username = user.username
+            first_name = user.first_name
+            last_name = user.last_name
+            email = user.email
+            password = user.password
+            roles = user.roles if hasattr(user, 'roles') else []
+            
             if not email:
-                logger.warning(f"⚠️ No email for user {username}")
+                logger.warning(f"⚠️ No email address for user {username}, skipping email")
                 return False
             
-            logger.info(f"📨 Sending email to {email} with pwd {plain_password[:4]}***")
-            print(f"📨 Sending email to {email}")
+            logger.info(f"📨 Attempting to send welcome email to {email}")
+            print(f"📨 Attempting to send welcome email to {email}")
             
             # Create email message
             msg = MIMEMultipart()
@@ -129,20 +133,18 @@ configOverrides:
             msg['From'] = SMTP_MAIL_FROM
             msg['To'] = email
             
-            # Email body with plain-text password
+            # Email body
             role_names = ', '.join([r.name for r in roles]) if roles else 'User'
             body = f"""Hello {first_name or username},
     
     Your Superset account has been created successfully!
     
-    Username {username}
-    Email {email}
-    Role(s) {role_names}
-    Initial assigned password {plain_password}
+    Username: {username}
+    Email: {email}
+    Role(s): {role_names}
+    Initial assigned password: {password if password else 'N/A'}
     
-    You can log in at http://superset.local:8088
-    
-    For security reasons, please change your password after your first login.
+    You can log in at: http://superset.local:8088
     
     Enjoy exploring your data!
     
@@ -152,7 +154,8 @@ configOverrides:
             msg.attach(MIMEText(body, 'plain'))
             
             # Send email using SMTP
-            logger.info(f"🔌 Connecting to SMTP {SMTP_HOST}:{SMTP_PORT}")
+            logger.info(f"🔌 Connecting to SMTP server {SMTP_HOST}:{SMTP_PORT}")
+            print(f"🔌 Connecting to SMTP server {SMTP_HOST}:{SMTP_PORT}")
             
             if SMTP_SSL:
                 server = smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=10)
@@ -160,80 +163,55 @@ configOverrides:
                 server = smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10)
             
             if SMTP_STARTTLS and not SMTP_SSL:
+                logger.info("🔐 Starting TLS")
                 server.starttls()
             
             if SMTP_USER and SMTP_PASSWORD:
+                logger.info(f"🔑 Logging in as {SMTP_USER}")
                 server.login(SMTP_USER, SMTP_PASSWORD)
             
             server.send_message(msg)
             server.quit()
             
-            logger.info(f"✅ Welcome email sent to {email}")
+            logger.info(f"✅ Welcome email sent successfully to {email}")
             print(f"✅ Welcome email sent to {email}")
             return True
         except Exception as e:
-            logger.error(f"❌ Failed to send email {str(e)}", exc_info=True)
-            print(f"❌ Failed to send email {str(e)}")
+            logger.error(f"❌ Failed to send welcome email: {str(e)}", exc_info=True)
+            print(f"❌ Failed to send welcome email: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return False
     
-    # Custom UserModelView to intercept form submission
-    class CustomUserModelView(UserModelView):
-        def pre_add(self, item):
-            """Called before user is added via UI - capture plain password"""
-            logger.info(f"👤 pre_add called for {item.username}")
-            print(f"👤 pre_add called for {item.username}")
-            
-            # Store the plain password before it gets hashed
-            if hasattr(item, 'password') and item.password:
-                temp_passwords[item.username] = item.password
-                logger.info(f"💾 Stored password for {item.username}")
-                print(f"💾 Stored password for {item.username} {item.password[:4]}***")
+    # Event listener for new user creation
+    def user_after_insert_listener(mapper, connection, target):
+        """Triggered when a new user is inserted into the database"""
+        logger.info(f"👤 SQLAlchemy event: User created - {target.username}")
+        print(f"👤 SQLAlchemy event: User created - {target.username}")
+        # Send email in background to avoid blocking the insert
+        try:
+            send_welcome_email(target)
+        except Exception as e:
+            logger.error(f"Error in user_after_insert_listener: {e}")
+            print(f"Error in user_after_insert_listener: {e}")
     
     # Custom Security Manager
     class CustomSecurityManager(SupersetSecurityManager):
-        usermodeview = CustomUserModelView
-        
         def __init__(self, appbuilder):
             super().__init__(appbuilder)
             logger.info("🔧 CustomSecurityManager initialized!")
             print("🔧 CustomSecurityManager initialized!")
             
-            # Register SQLAlchemy event listener
-            from sqlalchemy import event
-            event.listen(self.user_model, 'after_insert', self.user_after_insert)
-            logger.info("🔧 Registered after_insert event listener")
-            print("🔧 Registered after_insert event listener")
-        
-        def user_after_insert(self, mapper, connection, target):
-            """Called after user is inserted into database"""
-            logger.info(f"🆕 User inserted {target.username}, email {target.email}")
-            print(f"🆕 User inserted {target.username}")
-            
-            # Retrieve the plain password we stored earlier
-            plain_password = temp_passwords.pop(target.username, None)
-            
-            if plain_password and target.email:
-                logger.info(f"📧 Sending email with password {plain_password[:4]}***")
-                print(f"📧 Sending email to {target.email}")
-                
-                roles = list(target.roles) if hasattr(target, 'roles') else []
-                send_welcome_email(
-                    target.username,
-                    target.first_name,
-                    target.last_name,
-                    target.email,
-                    roles,
-                    plain_password
-                )
-            else:
-                logger.warning(f"⚠️ No password found for {target.username}")
-                print(f"⚠️ No password to send for {target.username}")
+            # Register SQLAlchemy event listener for User inserts
+            logger.info("🎯 Registering SQLAlchemy after_insert event for User model")
+            print("🎯 Registering SQLAlchemy after_insert event for User model")
+            event.listen(self.user_model, 'after_insert', user_after_insert_listener)
     
     # Register custom security manager
     CUSTOM_SECURITY_MANAGER = CustomSecurityManager
     
     logger.info("✅ CustomSecurityManager registered")
-    print("✅ CustomSecurityManager registered")
+    print("✅ CustomSecurityManager registered in config")
 
 
 # PostgreSQL for metadata storage
