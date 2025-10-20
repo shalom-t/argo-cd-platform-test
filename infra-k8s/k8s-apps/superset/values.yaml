@@ -117,7 +117,7 @@ configOverrides:
             first_name = user.first_name
             last_name = user.last_name
             email = user.email
-            password = user.password
+            # password = user.password
             roles = user.roles if hasattr(user, 'roles') else []
             
             if not email:
@@ -142,7 +142,7 @@ configOverrides:
     Username: {username}
     Email: {email}
     Role(s): {role_names}
-    Initial assigned password: {password if password else 'N/A'}
+    # Initial assigned password: {password if password else 'N/A'}
     
     You can log in at: http://superset.local:8088
     
