@@ -2,6 +2,10 @@
 # Superset helm chart additional values file #
 #############################################
 
+# Image configuration - override default image tag
+image:
+  tag: "5.0.0"
+
 # Service configuration
 service:
   # Service type is ClusterIP
