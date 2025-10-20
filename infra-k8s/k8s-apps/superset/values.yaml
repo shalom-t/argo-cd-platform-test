@@ -88,6 +88,30 @@ configOverrides:
     # Enable proxy fix
     ENABLE_PROXY_FIX = True
   
+  # Redis cache configuration
+  cache: |
+    # Configure Redis as the caching backend
+    CACHE_CONFIG = {
+        'CACHE_TYPE': 'RedisCache',
+        'CACHE_DEFAULT_TIMEOUT': 300,
+        'CACHE_KEY_PREFIX': 'superset_cache_',
+        'CACHE_REDIS_HOST': '{{ .Release.Name }}-redis-master',
+        'CACHE_REDIS_PORT': 6379,
+        'CACHE_REDIS_PASSWORD': 'superset',
+        'CACHE_REDIS_DB': 1,
+    }
+    
+    # Data cache configuration (for chart data)
+    DATA_CACHE_CONFIG = {
+        'CACHE_TYPE': 'RedisCache',
+        'CACHE_DEFAULT_TIMEOUT': 86400,  # 24 hours
+        'CACHE_KEY_PREFIX': 'superset_data_',
+        'CACHE_REDIS_HOST': '{{ .Release.Name }}-redis-master',
+        'CACHE_REDIS_PORT': 6379,
+        'CACHE_REDIS_PASSWORD': 'superset',
+        'CACHE_REDIS_DB': 1,
+    }
+  
   # Custom security manager for user registration emails
   custom_security: |
     import os
@@ -272,6 +296,8 @@ postgresql:
 
 # Redis for caching and Celery task queue
 redis:
+  # Enable Redis (required for Superset caching and async tasks)
+  enabled: true
   image:
     registry: docker.io
     repository: bitnami/redis
@@ -280,9 +306,6 @@ redis:
     # registry: 806137713344.dkr.ecr.eu-west-1.amazonaws.com
     # repository: bitnami/redis
     # tag: sha256-142ab4d0c251bcf5466fffd33766350af718a6725cb926710be19fad00b2b035
-
-  # Enable Redis (required for Superset caching and async tasks)
-  enabled: true
   # Redis authentication configuration
   auth:
     # Enable password authentication
@@ -290,7 +313,6 @@ redis:
     # Password for Redis - must match what Superset expects
     # The Superset chart will automatically configure this
     password: superset
-
   master:
     persistence:
       # Enable persistent storage for Redis data
