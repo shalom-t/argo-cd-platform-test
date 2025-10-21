@@ -95,16 +95,6 @@ supersetCeleryBeat:
 #   GLOBAL_ASYNC_QUERIES_JWT_SECRET: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
 #   JWT_SECRET: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
 
-celery:
-  worker:
-    resources:
-      requests:
-        memory: "512Mi"
-        cpu: "0.5"
-      limits:
-        memory: "1Gi"
-        cpu: "1"
-        
 configOverrides:
   # Secret key for encryption
   secret: |
@@ -424,22 +414,26 @@ supersetWorker:
   # Reason: The -E flag enables Celery events, which allows monitoring tools like Flower
   # to track worker activity and task execution in real-time
   # Using --uid=superset tells Celery to drop privileges and run as the 'superset' user
+  # Concurrency reduced to 4 to prevent OOMKilled errors (default is 10)
   command:
     - "/bin/sh"
     - "-c"
-    - ". /app/pythonpath/superset_bootstrap.sh; celery --app=superset.tasks.celery_app:app worker -E --uid=superset"
+    - ". /app/pythonpath/superset_bootstrap.sh; celery --app=superset.tasks.celery_app:app worker -E --uid=superset --concurrency=4"
   resources:
     requests:
       # CPU guaranteed for Celery worker pods
       # Reason: Ensures stable resource allocation for background task processing.
-      cpu: 100m
+      cpu: 200m
       # Minimal memory guaranteed for worker pods.
-      memory: 512Mi
+      # Increased due to bootstrap script installing packages and Celery worker processes
+      memory: 1Gi
     limits:
       # Max CPU for worker pods
-      cpu: 500m
+      cpu: 1000m
       # Max memory for worker pods
-      memory: 1Gi
+      # Reason: Bootstrap script (apt install gcc, python-dev) + Celery prefork workers
+      # require significant memory. 2.5Gi provides headroom for 10 concurrent workers.
+      memory: 2560Mi
 
 # Disable default ingress (using Traefik IngressRoute instead)
 ingress:
