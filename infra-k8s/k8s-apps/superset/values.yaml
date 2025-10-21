@@ -78,12 +78,13 @@ supersetCeleryBeat:
   enabled: true
 
 extraSecretEnv:
-  SECRET_KEY: QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ
   ASYNC_QUERY_JWT_SECRET: mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345
 
 configOverrides:
   # Secret key for encryption
   secret: |
+    SECRET_KEY = QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ
+
     # Query row limit
     ROW_LIMIT = 5000
 
