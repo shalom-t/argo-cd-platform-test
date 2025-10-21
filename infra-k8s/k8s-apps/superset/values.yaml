@@ -413,16 +413,11 @@ supersetWorker:
   # Override the default command to add -E flag (enable events for monitoring)
   # Reason: The -E flag enables Celery events, which allows monitoring tools like Flower
   # to track worker activity and task execution in real-time
+  # Using --uid=superset tells Celery to drop privileges and run as the 'superset' user
   command:
     - "/bin/sh"
     - "-c"
-    - ". /app/pythonpath/superset_bootstrap.sh; celery --app=superset.tasks.celery_app:app worker -E"
-  # Run worker pods as non-root user (UID 1000 = superset user)
-  # Reason: Security best practice - avoid running Celery workers as root
-  podSecurityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
+    - ". /app/pythonpath/superset_bootstrap.sh; celery --app=superset.tasks.celery_app:app worker -E --uid=superset"
   resources:
     requests:
       # CPU guaranteed for Celery worker pods
