@@ -78,7 +78,7 @@ supersetCeleryBeat:
   enabled: true
 
 extraSecretEnv:
-  SECRET_KEY: "QjgIqDzX7utN2qCp4YrtML+Co5U/oQxSo3F30KFh6V3RCb0Myi2bfVlZ"
+  SECRET_KEY: "Iy6mTNpe8SaC7moVhtEO0fJH+STKk880l9DmK4MCKki+SAMoz8lyzbNR"
   ASYNC_QUERY_JWT_SECRET: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
   JWT_SECRET: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
 
