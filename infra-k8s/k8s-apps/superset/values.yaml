@@ -113,6 +113,15 @@ configOverrides:
 
     GLOBAL_ASYNC_QUERIES_JWT_SECRET = "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
 
+    RATELIMIT_ENABLED = True
+
+    # Default rate limits (requests per second)
+    RATELIMIT_DEFAULT = "100 per second"
+
+    # Rate limiting storage (uses Redis DB 2 to avoid conflicts)
+    # Reason: Rate limiting protects API endpoints from abuse and ensures fair resource usage
+    RATELIMIT_STORAGE_URI = "redis://:superset@{{ .Release.Name }}-redis-master:6379/2"
+
   # Redis cache configuration
   cache: |
     # Configure Redis as the caching backend
