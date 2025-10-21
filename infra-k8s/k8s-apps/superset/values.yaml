@@ -401,6 +401,13 @@ resources:
 
 # Additional worker resources
 supersetWorker:
+  # Override the default command to add -E flag (enable events for monitoring)
+  # Reason: The -E flag enables Celery events, which allows monitoring tools like Flower
+  # to track worker activity and task execution in real-time
+  command:
+    - "/bin/sh"
+    - "-c"
+    - ". /app/pythonpath/superset_bootstrap.sh; celery --app=superset.tasks.celery_app:app worker -E"
   resources:
     requests:
       # CPU guaranteed for Celery worker pods
