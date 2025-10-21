@@ -41,6 +41,10 @@ extraEnvRaw:
     value: "superset@test.local"
   - name: ENABLE_ALERTS_REPORTS
     value: "True"
+  - name: ASYNC_QUERY_JWT_SECRET
+    value: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
+  - name: JWT_SECRET
+    value: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
 
 # Bootstrap and initialize Superset database and admin user
 init:
@@ -85,7 +89,7 @@ configOverrides:
   # Secret key for encryption
   secret: |
     SECRET_KEY = "Iy6mTNpe8SaC7moVhtEO0fJH+STKk880l9DmK4MCKki+SAMoz8lyzbNR"
-    
+
     # Query row limit
     ROW_LIMIT = 5000
 
