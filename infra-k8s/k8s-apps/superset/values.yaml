@@ -45,6 +45,16 @@ extraEnvRaw:
     value: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
   - name: JWT_SECRET
     value: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
+  - name: ROW_LIMIT
+    value: "5000"
+  - name: ENABLE_PROXY_FIX
+    value: "True"
+  - name: FEATURE_FLAGS
+    value: "{'GLOBAL_ASYNC_QUERIES': True}"
+  - name: CACHE_TYPE
+    value: "RedisCache"
+  - name: CACHE_DEFAULT_TIMEOUT
+    value: "300"
 
 # Bootstrap and initialize Superset database and admin user
 init:
