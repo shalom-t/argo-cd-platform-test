@@ -41,7 +41,7 @@ extraEnvRaw:
     value: "superset@test.local"
   - name: ENABLE_ALERTS_REPORTS
     value: "True"
-  - name: ASYNC_QUERY_JWT_SECRET
+  - name: GLOBAL_ASYNC_QUERIES_JWT_SECRET
     value: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
   - name: JWT_SECRET
     value: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
@@ -92,7 +92,7 @@ supersetCeleryBeat:
   enabled: true
 
 extraSecretEnv:
-  ASYNC_QUERY_JWT_SECRET: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
+  GLOBAL_ASYNC_QUERIES_JWT_SECRET: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
   JWT_SECRET: "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
 
 configOverrides:
