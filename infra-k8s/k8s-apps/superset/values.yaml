@@ -40,6 +40,18 @@ extraEnvRaw:
     value: ""
   - name: SMTP_MAIL_FROM
     value: "superset@test.local"
+  
+  # Auth0 OAuth2 Configuration
+  - name: AUTH0_DOMAIN
+    value: "dev-aq7ny02aoc5fe604.us.auth0.com"  # Your Auth0 domain
+  - name: AUTH0_CLIENT_ID
+    value: "KGQezDZsbp7rO2aOpjSLFi9a7AWUa9pF"
+  - name: AUTH0_CLIENT_SECRET
+    value: "8BOy74Brp-A6iSE9RKlnXyF91RjqvBimrWSaMp3Af-tP4aRpZ1LIC4dS1oBWZ2e1"
+  - name: AUTH0_AUDIENCE
+    value: ""  # Optional: API Audience identifier
+  - name: OAUTH_WHITELIST_REGEX
+    value: ".*"  # Allow all emails, or restrict: ".*@yourcompany\\.com$"
 
 # Bootstrap and initialize Superset database and admin user
 init:
@@ -108,6 +120,63 @@ configOverrides:
     # Rate limiting storage (uses Redis DB 2 to avoid conflicts)
     # Reason: Rate limiting protects API endpoints from abuse and ensures fair resource usage
     RATELIMIT_STORAGE_URI = "redis://:superset@{{ .Release.Name }}-redis-master:6379/2"
+
+  # Auth0 OAuth2 Authentication Configuration
+  oauth: |
+    import os
+    from flask_appbuilder.security.manager import AUTH_OAUTH
+    
+    # Enable OAuth authentication (instead of database authentication)
+    AUTH_TYPE = AUTH_OAUTH
+    
+    # Allow users to self-register (create their own accounts via Auth0)
+    AUTH_USER_REGISTRATION = True
+    
+    # Default role for self-registered users
+    # Options: Admin, Alpha, Gamma, Public
+    AUTH_USER_REGISTRATION_ROLE = "Gamma"
+    
+    # Map OAuth roles to Superset roles
+    AUTH_ROLE_ADMIN = 'Admin'
+    AUTH_ROLE_PUBLIC = 'Public'
+    
+    # Auth0 OAuth Provider Configuration
+    OAUTH_PROVIDERS = [
+        {
+            'name': 'auth0',
+            'icon': 'fa-lock',
+            'token_key': 'access_token',
+            'remote_app': {
+                'client_id': os.getenv('AUTH0_CLIENT_ID', ''),
+                'client_secret': os.getenv('AUTH0_CLIENT_SECRET', ''),
+                'api_base_url': f"https://{os.getenv('AUTH0_DOMAIN', '')}/",
+                'client_kwargs': {
+                    'scope': 'openid email profile',
+                },
+                'server_metadata_url': f"https://{os.getenv('AUTH0_DOMAIN', '')}/.well-known/openid-configuration",
+                'request_token_url': None,
+                'access_token_url': f"https://{os.getenv('AUTH0_DOMAIN', '')}/oauth/token",
+                'authorize_url': f"https://{os.getenv('AUTH0_DOMAIN', '')}/authorize",
+                'jwks_uri': f"https://{os.getenv('AUTH0_DOMAIN', '')}/.well-known/jwks.json",
+            },
+            # Optional: whitelist specific email domains
+            'whitelist': [os.getenv('OAUTH_WHITELIST_REGEX', '.*')]
+        }
+    ]
+    
+    # Optional: Custom user info parsing for Auth0
+    # Uncomment if you need to map Auth0 user attributes
+    # from flask_appbuilder.security.manager import AUTH_USER_REGISTRATION
+    # 
+    # def auth_user_registration(self, user_info):
+    #     """Custom user registration handler for Auth0"""
+    #     user = {
+    #         'username': user_info.get('email', '').split('@')[0],
+    #         'email': user_info.get('email', ''),
+    #         'first_name': user_info.get('given_name', ''),
+    #         'last_name': user_info.get('family_name', ''),
+    #     }
+    #     return user
 
   # Redis cache configuration
   cache: |
@@ -325,7 +394,6 @@ postgresql:
     # tag: sha25672c84b3980dc0f90f5e5e4470554e8994d3d2a60f622318dd29ad23b3ebf5b44
   # Enable PostgreSQL (required for Superset metadata storage)
   enabled: true
-
   auth:
     # Username for the application database user (used by Superset to connect)
     # This creates a non-superuser account for Superset
@@ -338,7 +406,6 @@ postgresql:
     # Password for the PostgreSQL superuser (postgres)
     # Required for administrative tasks and initial setup
     # postgresPassword: superset123
-
   primary:
     persistence:
       # Enable persistent storage for PostgreSQL data
