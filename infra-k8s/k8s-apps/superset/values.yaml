@@ -41,15 +41,24 @@ extraEnvRaw:
   - name: SMTP_MAIL_FROM
     value: "superset@test.local"
   
-  # Auth0 OAuth2 Configuration
-  # These credentials are also set as defaults in the oauth config section below
-  # You can override them here or use Kubernetes secrets for production
+  # Auth0 OAuth2 Configuration for SSO (Single Sign-On)
+  # Users authenticate with Google Gmail - NO Auth0 registration needed!
+  # Auth0 acts as OAuth broker to pass Google authentication to Superset
   - name: AUTH0_DOMAIN
     value: "dev-vfdepkcc6kiv3sql.us.auth0.com"
   - name: AUTH0_CLIENT_ID
     value: "SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY"
   - name: AUTH0_CLIENT_SECRET
     value: "kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9"
+  
+  # Email domain whitelist for SSO access control
+  # Examples:
+  # - Allow all Gmail: ".*@gmail\\.com$"
+  # - Company only: ".*@yourcompany\\.com$"
+  # - Multiple domains: ".*@(company1|company2)\\.com$"
+  # - Allow all (default): ".*"
+  - name: OAUTH_WHITELIST_REGEX
+    value: ".*"  # Allow all emails by default
 
 # Bootstrap and initialize Superset database and admin user
 init:
@@ -128,16 +137,16 @@ configOverrides:
   # Auth0 OAuth2 Configuration (integrated with database auth)
   oauth: |
     import os
-    from flask_appbuilder.security.manager import AUTH_OAUTH
+    from flask_appbuilder.security.manager import AUTH_DB
     
     # Set authentication type to DATABASE (allows email/password login)
     # OAuth buttons will still appear alongside the login form
-    AUTH_TYPE = AUTH_OAUTH
+    AUTH_TYPE = AUTH_DB
     
     # Allow user self registration via OAuth
     # When False, only pre-existing users (created by admin) can login via OAuth
     # When True, new users can self-register via OAuth
-    # AUTH_USER_REGISTRATION = True
+    AUTH_USER_REGISTRATION = True
     
     # Default role for self-registered users (via OAuth)
     # Options: Admin, Alpha, Gamma, Public
@@ -146,7 +155,16 @@ configOverrides:
     # Auth0 domain - replace with your actual Auth0 domain
     AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN', 'dev-vfdepkcc6kiv3sql.us.auth0.com')
 
-    # OAuth Providers Configuration
+    # Email domain whitelist for SSO (optional - restrict to specific domains)
+    # Examples:
+    # - Allow all: '.*'
+    # - Single domain: '.*@yourcompany\\.com$'
+    # - Multiple domains: '.*@(company1|company2)\\.com$'
+    # - Gmail only: '.*@gmail\\.com$'
+    OAUTH_WHITELIST_REGEX = os.getenv('OAUTH_WHITELIST_REGEX', '.*')  # Allow all by default
+
+    # OAuth Providers Configuration - Google SSO via Auth0
+    # Users authenticate with Google (Gmail) - NO Auth0 account needed!
     OAUTH_PROVIDERS = [
         {   
             'name': 'Auth0',
@@ -167,7 +185,9 @@ configOverrides:
                 'authorize_url': f'https://{AUTH0_DOMAIN}/authorize',
                 'jwks_uri': f'https://{AUTH0_DOMAIN}/.well-known/jwks.json',
                 'server_metadata_url': f'https://{AUTH0_DOMAIN}/.well-known/openid-configuration',
-            }
+            },
+            # Whitelist: only emails matching this regex can login
+            'whitelist': [OAUTH_WHITELIST_REGEX]
         }
     ]
 
