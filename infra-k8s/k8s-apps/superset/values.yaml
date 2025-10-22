@@ -97,7 +97,6 @@ configOverrides:
         'GLOBAL_ASYNC_QUERIES': True,
     }
 
-    GLOBAL_ASYNC_QUERIES_JWT_SECRET = "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
 
     RATELIMIT_ENABLED = True
 
