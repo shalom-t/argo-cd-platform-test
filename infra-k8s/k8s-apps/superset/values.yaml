@@ -42,16 +42,14 @@ extraEnvRaw:
     value: "superset@test.local"
   
   # Auth0 OAuth2 Configuration
-  # - name: AUTH0_DOMAIN
-  #   value: "dev-vfdepkcc6kiv3sql.us.auth0.com"  # Your Auth0 domain
-  # - name: AUTH0_CLIENT_ID
-  #   value: "SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY"
-  # - name: AUTH0_CLIENT_SECRET
-  #   value: "kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9"
-  # - name: AUTH0_AUDIENCE
-  #   value: ""  # Optional: API Audience identifier
-  # - name: OAUTH_WHITELIST_REGEX
-  #   value: ".*"  # Allow all emails, or restrict: ".*@yourcompany\\.com$"
+  # These credentials are also set as defaults in the oauth config section below
+  # You can override them here or use Kubernetes secrets for production
+  - name: AUTH0_DOMAIN
+    value: "dev-vfdepkcc6kiv3sql.us.auth0.com"
+  - name: AUTH0_CLIENT_ID
+    value: "SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY"
+  - name: AUTH0_CLIENT_SECRET
+    value: "kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9"
 
 # Bootstrap and initialize Superset database and admin user
 init:
@@ -122,99 +120,48 @@ configOverrides:
     RATELIMIT_STORAGE_URI = "redis://:superset@{{ .Release.Name }}-redis-master:6379/2"
 
 
-  # Auth0 OAuth2 Configuration
+  # Auth0 OAuth2 Configuration (with Email/Password login enabled)
   oauth: |
-    from flask_appbuilder.security.manager import AUTH_OAUTH
-
-    # Set the authentication type to OAuth
-    AUTH_TYPE = AUTH_OAUTH
+    import os
+    from flask_appbuilder.security.manager import AUTH_DB
+    
+    # Set authentication type to DATABASE (allows email/password login)
+    # OAuth buttons will still appear alongside the login form
+    AUTH_TYPE = AUTH_DB
+    
+    # Auth0 domain - replace with your actual Auth0 domain
+    AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN', 'dev-vfdepkcc6kiv3sql.us.auth0.com')
 
     OAUTH_PROVIDERS = [
-        {   'name':'egaSSO',
-            'token_key':'access_token', # Name of the token in the response of access_token_url
-            'icon':'fa-address-card',   # Icon for the provider
+        {   
+            'name': 'Auth0',
+            'token_key': 'access_token',
+            'icon': 'fa-address-card',
             'remote_app': {
-                'client_id': os.getenv('AUTH0_CLIENT_ID', ''),  # Client Id (Identify Superset application)
-                'client_secret': os.getenv('AUTH0_CLIENT_SECRET', ''), # Secret for this Client Id (Identify Superset application)
-                'client_kwargs':{
-                    'scope': 'read'               # Scope for the Authorization
+                'client_id': os.getenv('AUTH0_CLIENT_ID', 'SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY'),
+                'client_secret': os.getenv('AUTH0_CLIENT_SECRET', 'kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9'),
+                'client_kwargs': {
+                    'scope': 'openid email profile'
                 },
-                'access_token_method':'POST',    # HTTP Method to call access_token_url
-                'access_token_params':{        # Additional parameters for calls to access_token_url
-                    'client_id': os.getenv('AUTH0_CLIENT_ID', '')
+                'access_token_method': 'POST',
+                'access_token_params': {
+                    'client_id': os.getenv('AUTH0_CLIENT_ID', 'SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY')
                 },
-                # 'jwks_uri':'https://myAuthorizationServe/adfs/discovery/keys', # may be required to generate token
-                # 'access_token_headers':{    # Additional headers for calls to access_token_url
-                #     'Authorization': 'Basic Base64EncodedClientIdAndSecret'
-                # },
-                # 'api_base_url':'https://myAuthorizationServer/oauth2AuthorizationServer/',
-                # 'access_token_url':'https://myAuthorizationServer/oauth2AuthorizationServer/token',
-                # 'authorize_url':'https://myAuthorizationServer/oauth2AuthorizationServer/authorize'
+                'api_base_url': f'https://{AUTH0_DOMAIN}/',
+                'access_token_url': f'https://{AUTH0_DOMAIN}/oauth/token',
+                'authorize_url': f'https://{AUTH0_DOMAIN}/authorize',
+                'jwks_uri': f'https://{AUTH0_DOMAIN}/.well-known/jwks.json',
+                'server_metadata_url': f'https://{AUTH0_DOMAIN}/.well-known/openid-configuration',
             }
         }
     ]
 
-    # Will allow user self registration, allowing to create Flask users from Authorized User
+    # Allow user self registration via OAuth
     AUTH_USER_REGISTRATION = True
 
-    # The default user self registration role
+    # Default role for self-registered users (via OAuth)
+    # Options: Admin, Alpha, Gamma, Public
     AUTH_USER_REGISTRATION_ROLE = "Public"
-  # Auth0 OAuth2 Authentication Configuration
-  # oauth: |
-  #   import os
-  #   from flask_appbuilder.security.manager import AUTH_OAUTH
-    
-  #   # Enable OAuth authentication (instead of database authentication)
-  #   AUTH_TYPE = AUTH_OAUTH
-    
-  #   # Allow users to self-register (create their own accounts via Auth0)
-  #   AUTH_USER_REGISTRATION = True
-    
-  #   # Default role for self-registered users
-  #   # Options: Admin, Alpha, Gamma, Public
-  #   AUTH_USER_REGISTRATION_ROLE = "Gamma"
-    
-  #   # Map OAuth roles to Superset roles
-  #   AUTH_ROLE_ADMIN = 'Admin'
-  #   AUTH_ROLE_PUBLIC = 'Public'
-    
-  #   # Auth0 OAuth Provider Configuration
-  #   OAUTH_PROVIDERS = [
-  #       {
-  #           'name': 'auth0',
-  #           'icon': 'fa-lock',
-  #           'token_key': 'access_token',
-  #           'remote_app': {
-  #               'client_id': os.getenv('AUTH0_CLIENT_ID', ''),
-  #               'client_secret': os.getenv('AUTH0_CLIENT_SECRET', ''),
-  #               'api_base_url': f"https://{os.getenv('AUTH0_DOMAIN', '')}/",
-  #               'client_kwargs': {
-  #                   'scope': 'openid email profile',
-  #               },
-  #               'server_metadata_url': f"https://{os.getenv('AUTH0_DOMAIN', '')}/.well-known/openid-configuration",
-  #               'request_token_url': None,
-  #               'access_token_url': f"https://{os.getenv('AUTH0_DOMAIN', '')}/oauth/token",
-  #               'authorize_url': f"https://{os.getenv('AUTH0_DOMAIN', '')}/authorize",
-  #               'jwks_uri': f"https://{os.getenv('AUTH0_DOMAIN', '')}/.well-known/jwks.json",
-  #           },
-  #           # Optional: whitelist specific email domains
-  #           'whitelist': [os.getenv('OAUTH_WHITELIST_REGEX', '.*')]
-  #       }
-  #   ]
-    
-  #   # Optional: Custom user info parsing for Auth0
-  #   # Uncomment if you need to map Auth0 user attributes
-  #   # from flask_appbuilder.security.manager import AUTH_USER_REGISTRATION
-  #   # 
-  #   # def auth_user_registration(self, user_info):
-  #   #     """Custom user registration handler for Auth0"""
-  #   #     user = {
-  #   #         'username': user_info.get('email', '').split('@')[0],
-  #   #         'email': user_info.get('email', ''),
-  #   #         'first_name': user_info.get('given_name', ''),
-  #   #         'last_name': user_info.get('family_name', ''),
-  #   #     }
-  #   #     return user
 
   # Redis cache configuration
   cache: |
