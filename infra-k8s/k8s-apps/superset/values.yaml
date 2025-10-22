@@ -121,6 +121,44 @@ configOverrides:
     # Reason: Rate limiting protects API endpoints from abuse and ensures fair resource usage
     RATELIMIT_STORAGE_URI = "redis://:superset@{{ .Release.Name }}-redis-master:6379/2"
 
+
+  # Auth0 OAuth2 Configuration
+  oauth: |
+    from flask_appbuilder.security.manager import AUTH_OAUTH
+
+    # Set the authentication type to OAuth
+    AUTH_TYPE = AUTH_OAUTH
+
+    OAUTH_PROVIDERS = [
+        {   'name':'egaSSO',
+            'token_key':'access_token', # Name of the token in the response of access_token_url
+            'icon':'fa-address-card',   # Icon for the provider
+            'remote_app': {
+                'client_id': os.getenv('AUTH0_CLIENT_ID', ''),  # Client Id (Identify Superset application)
+                'client_secret': os.getenv('AUTH0_CLIENT_SECRET', ''), # Secret for this Client Id (Identify Superset application)
+                'client_kwargs':{
+                    'scope': 'read'               # Scope for the Authorization
+                },
+                'access_token_method':'POST',    # HTTP Method to call access_token_url
+                'access_token_params':{        # Additional parameters for calls to access_token_url
+                    'client_id': os.getenv('AUTH0_CLIENT_ID', '')
+                },
+                # 'jwks_uri':'https://myAuthorizationServe/adfs/discovery/keys', # may be required to generate token
+                # 'access_token_headers':{    # Additional headers for calls to access_token_url
+                #     'Authorization': 'Basic Base64EncodedClientIdAndSecret'
+                # },
+                # 'api_base_url':'https://myAuthorizationServer/oauth2AuthorizationServer/',
+                # 'access_token_url':'https://myAuthorizationServer/oauth2AuthorizationServer/token',
+                # 'authorize_url':'https://myAuthorizationServer/oauth2AuthorizationServer/authorize'
+            }
+        }
+    ]
+
+    # Will allow user self registration, allowing to create Flask users from Authorized User
+    AUTH_USER_REGISTRATION = True
+
+    # The default user self registration role
+    AUTH_USER_REGISTRATION_ROLE = "Public"
   # Auth0 OAuth2 Authentication Configuration
   # oauth: |
   #   import os
