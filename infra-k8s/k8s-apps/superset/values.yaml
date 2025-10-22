@@ -128,7 +128,7 @@ configOverrides:
   # Auth0 OAuth2 Configuration (integrated with database auth)
   oauth: |
     import os
-    from flask_appbuilder.security.manager import AUTH_DB
+    from flask_appbuilder.security.manager import AUTH_OAUTH
 
     AUTH_TYPE = AUTH_OAUTH
     
