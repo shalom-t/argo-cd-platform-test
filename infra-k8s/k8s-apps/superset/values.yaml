@@ -97,7 +97,10 @@ configOverrides:
         'GLOBAL_ASYNC_QUERIES': True,
     }
 
+    # JWT secret for async query authentication (must be at least 32 bytes)
+    GLOBAL_ASYNC_QUERIES_JWT_SECRET = "mk73pMFjxG9IcUrVrAhFc2nT8XS5jG7AndThisIsALongerSecretForAsyncQueries12345"
 
+    # Rate limiting for API endpoints
     RATELIMIT_ENABLED = True
 
     # Default rate limits (requests per second)
