@@ -40,7 +40,6 @@ extraEnvRaw:
     value: ""
   - name: SMTP_MAIL_FROM
     value: "superset@test.local"
- 
 
 # Bootstrap and initialize Superset database and admin user
 init:
@@ -104,7 +103,7 @@ configOverrides:
     RATELIMIT_ENABLED = True
 
     # Default rate limits (requests per second)
-    RATELIMIT_DEFAULT = "100 per second"
+    RATELIMIT_DEFAULT = "1000 per second"
 
     # Rate limiting storage (uses Redis DB 2 to avoid conflicts)
     # Reason: Rate limiting protects API endpoints from abuse and ensures fair resource usage
@@ -207,7 +206,6 @@ configOverrides:
             first_name = user.first_name
             last_name = user.last_name
             email = user.email
-            password = user.password
             roles = user.roles if hasattr(user, 'roles') else []
             
             if not email:
@@ -232,8 +230,8 @@ configOverrides:
     Username: {username}
     Email: {email}
     Role(s): {role_names}
-    Initial assigned password: {password if password else 'N/A'}
 
+    # This will be later changed to the actual URL of the Superset instance
     You can log in at: http://superset.local:8088
 
     Enjoy exploring your data!
@@ -279,9 +277,6 @@ configOverrides:
         logger.info(f"👤 SQLAlchemy event: User created - {target.username}")
         print(f"👤 SQLAlchemy event: User created - {target.username}")
 
-        logger.info(f"\n👤 SQLAlchemy event: User password - {target.password}")
-        print(f"👤 SQLAlchemy event: User password - {target.password}")
-        
         # Send email in background to avoid blocking the insert
         try:
             send_welcome_email(target)
@@ -309,7 +304,7 @@ configOverrides:
 
 # Bootstrap script - runs before Superset starts
 # Installs additional packages needed for Superset
-# This is need in order to use the Superser version 5.0.0 and Chart 0.15.0
+# This is need in order to use the Superser version 6.0.0 and Chart 0.15.0
 bootstrapScript: |
   #!/bin/bash
   apt update && apt install -y gcc libpq-dev python3-dev pkg-config
