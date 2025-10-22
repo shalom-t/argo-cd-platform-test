@@ -119,6 +119,11 @@ configOverrides:
     # Reason: Rate limiting protects API endpoints from abuse and ensures fair resource usage
     RATELIMIT_STORAGE_URI = "redis://:superset@{{ .Release.Name }}-redis-master:6379/2"
 
+    # reCAPTCHA Configuration (disabled by default)
+    # Set to None or empty string to disable reCAPTCHA on login
+    # To enable: get keys from https://www.google.com/recaptcha/admin
+    RECAPTCHA_PUBLIC_KEY = None
+    RECAPTCHA_PRIVATE_KEY = None
 
   # Auth0 OAuth2 Configuration (with Email/Password login enabled)
   oauth: |
