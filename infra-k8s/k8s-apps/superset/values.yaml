@@ -125,7 +125,7 @@ configOverrides:
     RECAPTCHA_PUBLIC_KEY = None
     RECAPTCHA_PRIVATE_KEY = None
 
-  # Auth0 OAuth2 Configuration (with Email/Password login enabled)
+  # Auth0 OAuth2 Configuration (integrated with database auth)
   oauth: |
     import os
     from flask_appbuilder.security.manager import AUTH_DB
@@ -134,9 +134,19 @@ configOverrides:
     # OAuth buttons will still appear alongside the login form
     AUTH_TYPE = AUTH_DB
     
+    # Allow user self registration via OAuth
+    # When False, only pre-existing users (created by admin) can login via OAuth
+    # When True, new users can self-register via OAuth
+    AUTH_USER_REGISTRATION = True
+    
+    # Default role for self-registered users (via OAuth)
+    # Options: Admin, Alpha, Gamma, Public
+    AUTH_USER_REGISTRATION_ROLE = "Public"
+    
     # Auth0 domain - replace with your actual Auth0 domain
     AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN', 'dev-vfdepkcc6kiv3sql.us.auth0.com')
 
+    # OAuth Providers Configuration
     OAUTH_PROVIDERS = [
         {   
             'name': 'Auth0',
@@ -160,13 +170,6 @@ configOverrides:
             }
         }
     ]
-
-    # Allow user self registration via OAuth
-    AUTH_USER_REGISTRATION = False
-
-    # Default role for self-registered users (via OAuth)
-    # Options: Admin, Alpha, Gamma, Public
-    AUTH_USER_REGISTRATION_ROLE = "Public"
 
   # Redis cache configuration
   cache: |
