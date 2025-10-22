@@ -136,63 +136,35 @@ configOverrides:
 
   # Auth0 OAuth2 Configuration (integrated with database auth)
   oauth: |
-    import os
-    from flask_appbuilder.security.manager import AUTH_DB
-    
-    # Set authentication type to DATABASE (allows email/password login)
-    # OAuth buttons will still appear alongside the login form
-    AUTH_TYPE = AUTH_DB
-    
-    # Allow user self registration via OAuth (SSO)
-    # MUST BE TRUE for SSO to work! 
-    # When True: Users can login with Gmail via Auth0 SSO (recommended)
-    # When False: Only pre-created users can use OAuth (not true SSO)
-    AUTH_USER_REGISTRATION = True
-    
-    # Default role for self-registered SSO users
-    # Options: Admin, Alpha, Gamma, Public
-    # Gamma = read-only access (recommended for SSO users)
-    # Public = minimal access
-    AUTH_USER_REGISTRATION_ROLE = "Gamma"
-    
-    # Auth0 domain - replace with your actual Auth0 domain
-    AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN', 'dev-vfdepkcc6kiv3sql.us.auth0.com')
+      import os
+      from flask_appbuilder.security.manager import AUTH_OAUTH
+      AUTH_TYPE = AUTH_OAUTH
 
-    # Email domain whitelist for SSO (optional - restrict to specific domains)
-    # Examples:
-    # - Allow all: '.*'
-    # - Single domain: '.*@yourcompany\\.com$'
-    # - Multiple domains: '.*@(company1|company2)\\.com$'
-    # - Gmail only: '.*@gmail\\.com$'
-    OAUTH_WHITELIST_REGEX = os.getenv('OAUTH_WHITELIST_REGEX', '.*')  # Allow all by default
+      # Enable self-registration via OAuth (SSO)
+      AUTH_USER_REGISTRATION = True
+      AUTH_USER_REGISTRATION_ROLE = "Gamma"  # Optional: Adjust role for new users
 
-    # OAuth Providers Configuration - Google SSO via Auth0
-    # Users authenticate with Google (Gmail) - NO Auth0 account needed!
-    OAUTH_PROVIDERS = [
-        {   
-            'name': 'Auth0',
-            'token_key': 'access_token',
-            'icon': 'fa-address-card',
-            'remote_app': {
-                'client_id': os.getenv('AUTH0_CLIENT_ID', 'SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY'),
-                'client_secret': os.getenv('AUTH0_CLIENT_SECRET', 'kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9'),
-                'client_kwargs': {
-                    'scope': 'openid email profile'
-                },
-                'access_token_method': 'POST',
-                'access_token_params': {
-                    'client_id': os.getenv('AUTH0_CLIENT_ID', 'SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY')
-                },
-                'api_base_url': f'https://{AUTH0_DOMAIN}/',
-                'access_token_url': f'https://{AUTH0_DOMAIN}/oauth/token',
-                'authorize_url': f'https://{AUTH0_DOMAIN}/authorize',
-                'jwks_uri': f'https://{AUTH0_DOMAIN}/.well-known/jwks.json',
-                'server_metadata_url': f'https://{AUTH0_DOMAIN}/.well-known/openid-configuration',
-            },
-            # Whitelist: only emails matching this regex can login
-            'whitelist': [OAUTH_WHITELIST_REGEX]
-        }
-    ]
+      # Auth0 configuration
+      AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN', 'dev-vfdepkcc6kiv3sql.us.auth0.com')
+      OAUTH_PROVIDERS = [
+          {
+              'name': 'Google',
+              'token_key': 'access_token',
+              'remote_app': {
+                  'client_id': os.getenv('AUTH0_CLIENT_ID', 'SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY'),
+                  'client_secret': os.getenv('AUTH0_CLIENT_SECRET', 'kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9'),
+                  'client_kwargs': {
+                      'scope': 'openid email profile'
+                  },
+                  'access_token_method': 'POST',
+                  'access_token_url': f'https://{AUTH0_DOMAIN}/oauth/token',
+                  'authorize_url': f'https://{AUTH0_DOMAIN}/authorize',
+                  'api_base_url': f'https://{AUTH0_DOMAIN}/',
+                  'jwks_uri': f'https://{AUTH0_DOMAIN}/.well-known/jwks.json',
+                  'server_metadata_url': f'https://{AUTH0_DOMAIN}/.well-known/openid-configuration',
+              },
+          }
+      ]
 
   # Redis cache configuration
   cache: |
