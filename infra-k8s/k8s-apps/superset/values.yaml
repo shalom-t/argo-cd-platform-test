@@ -129,24 +129,47 @@ configOverrides:
   oauth: |
     import os
     from flask_appbuilder.security.manager import AUTH_OAUTH
+    
+    # Set authentication type to DATABASE (allows email/password login)
+    # OAuth buttons will still appear alongside the login form
+    AUTH_TYPE = AUTH_DB
+    
+    # Allow user self registration via OAuth
+    # When False, only pre-existing users (created by admin) can login via OAuth
+    # When True, new users can self-register via OAuth
+    # AUTH_USER_REGISTRATION = True
+    
+    # Default role for self-registered users (via OAuth)
+    # Options: Admin, Alpha, Gamma, Public
+    AUTH_USER_REGISTRATION_ROLE = "Public"
+    
+    # Auth0 domain - replace with your actual Auth0 domain
+    AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN', 'dev-vfdepkcc6kiv3sql.us.auth0.com')
 
-    AUTH_TYPE = AUTH_OAUTH
-    
-    OAUTH_PROVIDERS = [{
-        'name':'Auth0',
-        'token_key':'access_token',
-        'icon':'fa-circle-o',
-        'remote_app': {
-            'client_id': os.getenv('AUTH0_CLIENT_ID', 'AUTH0_CLIENT_ID'),
-            'client_secret': os.getenv('AUTH0_CLIENT_SECRET', 'kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9'),
-            'api_base_url': f'https://{AUTH0_DOMAIN}/',
-            'client_kwargs':{
-                'scope': 'openid profile email'
-            },
+    # OAuth Providers Configuration
+    OAUTH_PROVIDERS = [
+        {   
+            'name': 'Auth0',
+            'token_key': 'access_token',
+            'icon': 'fa-address-card',
+            'remote_app': {
+                'client_id': os.getenv('AUTH0_CLIENT_ID', 'SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY'),
+                'client_secret': os.getenv('AUTH0_CLIENT_SECRET', 'kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9'),
+                'client_kwargs': {
+                    'scope': 'openid email profile'
+                },
+                'access_token_method': 'POST',
+                'access_token_params': {
+                    'client_id': os.getenv('AUTH0_CLIENT_ID', 'SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY')
+                },
+                'api_base_url': f'https://{AUTH0_DOMAIN}/',
+                'access_token_url': f'https://{AUTH0_DOMAIN}/oauth/token',
+                'authorize_url': f'https://{AUTH0_DOMAIN}/authorize',
+                'jwks_uri': f'https://{AUTH0_DOMAIN}/.well-known/jwks.json',
+                'server_metadata_url': f'https://{AUTH0_DOMAIN}/.well-known/openid-configuration',
+            }
         }
-    }]
-    
-    
+    ]
 
   # Redis cache configuration
   cache: |
