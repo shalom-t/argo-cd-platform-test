@@ -143,14 +143,17 @@ configOverrides:
     # OAuth buttons will still appear alongside the login form
     AUTH_TYPE = AUTH_DB
     
-    # Allow user self registration via OAuth
-    # When False, only pre-existing users (created by admin) can login via OAuth
-    # When True, new users can self-register via OAuth
-    AUTH_USER_REGISTRATION = False
+    # Allow user self registration via OAuth (SSO)
+    # MUST BE TRUE for SSO to work! 
+    # When True: Users can login with Gmail via Auth0 SSO (recommended)
+    # When False: Only pre-created users can use OAuth (not true SSO)
+    AUTH_USER_REGISTRATION = True
     
-    # Default role for self-registered users (via OAuth)
+    # Default role for self-registered SSO users
     # Options: Admin, Alpha, Gamma, Public
-    AUTH_USER_REGISTRATION_ROLE = "Public"
+    # Gamma = read-only access (recommended for SSO users)
+    # Public = minimal access
+    AUTH_USER_REGISTRATION_ROLE = "Gamma"
     
     # Auth0 domain - replace with your actual Auth0 domain
     AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN', 'dev-vfdepkcc6kiv3sql.us.auth0.com')
