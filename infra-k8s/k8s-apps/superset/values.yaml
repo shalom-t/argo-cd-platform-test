@@ -26,7 +26,8 @@ extraEnvRaw:
   - name: EMAIL_NOTIFICATIONS
     value: "True"
   - name: SMTP_HOST
-    value: "192.168.100.111" # 👈 your host IP
+    # value: "192.168.100.111" # 👈 your host IP
+    value: "192.168.1.233"
   - name: SMTP_PORT
     value: "1025"
   - name: SMTP_STARTTLS
