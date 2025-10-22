@@ -131,14 +131,15 @@ configOverrides:
     from flask_appbuilder.security.manager import AUTH_DB
 
     AUTH_TYPE = AUTH_OAUTH
+    
     OAUTH_PROVIDERS = [{
         'name':'Auth0',
         'token_key':'access_token',
         'icon':'fa-circle-o',
         'remote_app': {
-            'client_id': os.getenv('AUTH0_CLIENT_ID', 'SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY'),
+            'client_id': os.getenv('AUTH0_CLIENT_ID', 'AUTH0_CLIENT_ID'),
             'client_secret': os.getenv('AUTH0_CLIENT_SECRET', 'kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9'),
-            'api_base_url': f'https://{os.getenv('AUTH0_DOMAIN', 'dev-vfdepkcc6kiv3sql.us.auth0.com')}/',
+            'api_base_url': f'https://{AUTH0_DOMAIN}/',
             'client_kwargs':{
                 'scope': 'openid profile email'
             },
