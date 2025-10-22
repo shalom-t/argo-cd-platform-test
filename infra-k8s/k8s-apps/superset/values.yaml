@@ -132,7 +132,7 @@ configOverrides:
     
     # Set authentication type to DATABASE (allows email/password login)
     # OAuth buttons will still appear alongside the login form
-    AUTH_TYPE = AUTH_DB
+    AUTH_TYPE = AUTH_OAUTH
     
     # Allow user self registration via OAuth
     # When False, only pre-existing users (created by admin) can login via OAuth
