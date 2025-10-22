@@ -146,7 +146,7 @@ configOverrides:
     # Allow user self registration via OAuth
     # When False, only pre-existing users (created by admin) can login via OAuth
     # When True, new users can self-register via OAuth
-    AUTH_USER_REGISTRATION = True
+    AUTH_USER_REGISTRATION = False
     
     # Default role for self-registered users (via OAuth)
     # Options: Admin, Alpha, Gamma, Public
