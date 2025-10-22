@@ -150,6 +150,7 @@ configOverrides:
           {
               'name': 'Google',
               'token_key': 'access_token',
+              'icon': 'fa-google',
               'remote_app': {
                   'client_id': os.getenv('AUTH0_CLIENT_ID', 'SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY'),
                   'client_secret': os.getenv('AUTH0_CLIENT_SECRET', 'kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9'),
