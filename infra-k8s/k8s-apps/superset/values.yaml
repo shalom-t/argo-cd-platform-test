@@ -134,23 +134,28 @@ configOverrides:
     RECAPTCHA_PUBLIC_KEY = None
     RECAPTCHA_PRIVATE_KEY = None
 
-  # Auth0 OAuth2 Configuration (integrated with database auth)
+  # Auth0 OAuth2 Configuration (BOTH Google SSO AND Email/Password Login)
   oauth: |
       import os
-      from flask_appbuilder.security.manager import AUTH_OAUTH
-      AUTH_TYPE = AUTH_OAUTH
-
+      from flask_appbuilder.security.manager import AUTH_DB
+      
+      # CRITICAL: Use AUTH_DB to show BOTH login methods
+      # AUTH_DB = Shows email/password form + OAuth buttons
+      # AUTH_OAUTH = Shows ONLY OAuth buttons (no email/password form)
+      AUTH_TYPE = AUTH_DB
+      
       # Enable self-registration via OAuth (SSO)
       AUTH_USER_REGISTRATION = True
-      AUTH_USER_REGISTRATION_ROLE = "Gamma"  # Optional: Adjust role for new users
-
+      AUTH_USER_REGISTRATION_ROLE = "Gamma"  # Read-only for SSO users
+      
       # Auth0 configuration
       AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN', 'dev-vfdepkcc6kiv3sql.us.auth0.com')
+      
       OAUTH_PROVIDERS = [
           {
-              'name': 'Google',
+              'name': 'google',  # Changed from 'Auth0' to 'google' for "Login with Google" button
               'token_key': 'access_token',
-              'icon': 'fa-google',
+              'icon': 'fa-google',  # Google icon
               'remote_app': {
                   'client_id': os.getenv('AUTH0_CLIENT_ID', 'SMvMGKRDfQyTgGo8ZtqKYlCygNgeNZsY'),
                   'client_secret': os.getenv('AUTH0_CLIENT_SECRET', 'kYdtViUEQmqnqcfWLZO0ozmN6crumfWz9jCRw3A0TtIBlswzdh-MCgNM3rMQu5_9'),
